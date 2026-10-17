@@ -597,7 +597,7 @@ const RATES=['work','money','love','health'];
 /* ---------- シェア ---------- */
 /* 収益化の設定：ここに入れるだけで表示される */
 const TIP_URLS={ja:'',other:'https://ko-fi.com/businessmaker'};          // 投げ銭：ja=OFUSE など / other=Ko-fi など（空なら非表示）
-const ADSENSE={client:'ca-pub-4478590779171256',slot:''};        // 広告：AdSense の ca-pub-… と広告ユニットID（空なら非表示）
+const ADSENSE={client:'ca-pub-4478590779171256',slot:'4533542225'};        // 広告：AdSense の ca-pub-… と広告ユニットID（空なら非表示）
 const CONTACT_URL='https://businessmaker.net/';
 const tipUrl=()=>lang==='ja'?(TIP_URLS.ja||TIP_URLS.other):(TIP_URLS.other||TIP_URLS.ja);
 function tipBox(){const u=tipUrl();return u?`<div class="tipbox"><div><b>${esc(tr('tip.h'))}</b><p>${esc(tr('tip.p'))}</p></div><a class="btn pinkbtn" href="${esc(u)}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a></div>`:''}
@@ -634,7 +634,7 @@ function vFriend(){
   ${rateHtml(f.r)}
   ${kw.length?`<div class="kws">${kw.map(w=>`<span>#${w}</span>`).join('')}</div>`:''}
   ${sparkSvg(f.c,tr('fr.wave'))}</div>
-  <div class="friendcta"><h3>${esc(tr('fr.ctaH'))}</h3><p>${esc(tr('fr.ctaP'))}</p><button class="btn" data-act="home">${esc(tr('fr.ctaBtn'))}</button></div>`;
+  <div class="friendcta"><h3>${esc(tr('fr.ctaH'))}</h3><p>${esc(tr('fr.ctaP'))}</p><button class="btn" data-act="home">${esc(tr('fr.ctaBtn'))}</button></div>${footer()}`;
 }
 
 /* ---------- 最期の演出 ---------- */
@@ -744,6 +744,7 @@ function vShare(){
     </div>
     <figure class="mprev"><figcaption>${esc(tr('sh.preview'))}</figcaption><img class="imgcard" id="cardimg" alt="${esc(s.type+' · '+title())}"></figure>
     <p class="note">${esc(tr('sh.privacy'))}</p>
+    ${tipUrl()?`<a class="mtip" href="${esc(tipUrl())}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a>`:''}
   </div></div>`;
 }
 function updShareLinks(){const x=document.getElementById('shx'),t=document.getElementById('shth');if(x)x.href=xUrl();if(t)t.href=threadsUrl()}
