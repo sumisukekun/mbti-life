@@ -146,6 +146,13 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .lmap i.now{outline:2px solid var(--ink);outline-offset:1px}
 .maplg{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0;font-size:11px;color:var(--muted)}.maplg i{width:12px}
 .logp{min-height:200px}
+.o0{order:0}
+.scene{position:relative;border-radius:16px;overflow:hidden;border:2px solid var(--ink);background:#CFEBFF}
+.scene canvas{display:block;width:100%;height:auto;aspect-ratio:2/1;image-rendering:pixelated;image-rendering:crisp-edges}
+.scap{position:absolute;left:10px;right:10px;bottom:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
+.scap .chip{background:rgba(26,29,58,.82);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.scap .say{background:rgba(255,255,255,.92);color:#1A1D3A;font-size:13px;font-weight:700;padding:6px 10px;border-radius:10px;max-width:100%;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+@media (min-width:980px){.scene canvas{aspect-ratio:2/1}}
 .hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px;display:flex;flex-direction:column;gap:10px;border-bottom:1.5px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
 .hudtop{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
@@ -621,6 +628,84 @@ function startLife(type,p){
   }
 }
 function bar(label,v,color){return `<div class="bar"><span>${label}</span><span class="tr"><i style="width:${v}%;background:${color}"></i></span><span class="v">${Math.round(v)}</span></div>`}
+
+/* ---------- イメージ図（ドット絵の情景） ---------- */
+const SW=192,SH=96,GY=78;
+function sceneInfo(){
+  if(s.dead)return {place:'grave',label:'永遠の眠り'};
+  if(s.health<30)return {place:'hospital',label:'病院'};
+  if(s.uni)return {place:'school',label:'キャンパス'};
+  if(s.working)return {place:s.founder?'tower':'office',label:s.founder?'自分の会社':'職場'};
+  if(s.retired)return {place:'park',label:'公園'};
+  return {place:'home',label:s.house?'わが家':'自宅'};
+}
+const SEASONS=['春','夏','秋','冬'];
+function season(){return (s.age-s.startAge)%4}
+function scenePeople(){
+  const hair=a=>a>=78?'#F2F2F2':a>=58?'#A9A9B3':'#2B2233';
+  const g=grp(s.type),shirt={nt:'#3D6BFF',nf:'#F2367F',sj:'#1F9D6B',sp:'#F2A20C'}[g];
+  const ppl=[{a:s.age,shirt,hair:hair(s.age),main:true}];
+  if(s.partner||s.married)ppl.push({a:s.age,shirt:'#8E6CF0',hair:hair(s.age),long:true});
+  if(!s.kidsOut)s.kidAges.slice(0,3).forEach((b,i)=>{const a=s.age-b;if(a>=0)ppl.push({a,shirt:['#FFB547','#4CC9F0','#9BE564'][i],hair:'#3A2A20'})});
+  for(let i=0;i<Math.min(2,s.grand);i++)ppl.push({a:3+i*2,shirt:'#FF8FB1',hair:'#3A2A20'});
+  return ppl;
+}
+function px(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h)}
+function drawPerson(c,x,p,t,i){
+  const k=p.a<4?.5:p.a<10?.66:p.a<15?.85:1;const bob=(Math.floor(t/400+i)%2)*(p.a>75?0:1);
+  const H=Math.round(16*k),hw=Math.max(3,Math.round(5*k)),y=GY-H-bob;
+  px(c,x,y,hw,hw,'#F3C9A6');                       // 顔
+  px(c,x,y-1,hw,2,p.hair);                          // 髪
+  if(p.long)px(c,x-1,y,1,hw+2,p.hair),px(c,x+hw,y,1,hw+2,p.hair);
+  px(c,x+1,y+Math.round(hw/2),1,1,'#2B2233');       // 目
+  const bh=Math.round(7*k);px(c,x-1,y+hw,hw+2,bh,p.shirt); // 服
+  px(c,x,y+hw+bh,1,H-hw-bh+bob,'#3B3B4F');px(c,x+hw-1,y+hw+bh,1,H-hw-bh+bob,'#3B3B4F'); // 脚
+  if(p.a>=75&&p.main){px(c,x+hw+2,y+hw,1,H-hw+bob,'#7A5230')} // 杖
+}
+function drawPlace(c,pl,t){
+  const W=SW;
+  if(pl==='school'){px(c,96,34,70,GY-34,'#E9D9C4');px(c,96,30,70,5,'#B0574B');for(let i=0;i<5;i++)for(let j=0;j<3;j++)px(c,101+i*13,40+j*12,7,7,'#7FB3E0');px(c,125,20,12,12,'#E9D9C4');px(c,128,23,6,6,'#fff');px(c,130,24,1,3,'#333');px(c,130,26,3,1,'#333');px(c,127,GY-12,8,12,'#7A5230')}
+  else if(pl==='office'||pl==='tower'){const bs=[[100,30,22],[124,18,26],[152,38,20],[174,26,16]];bs.forEach(([x,y,w],k)=>{px(c,x,y,w,GY-y,['#5B6B8C','#4A5878','#6C7A99','#56658A'][k]);for(let yy=y+4;yy<GY-6;yy+=6)for(let xx=x+3;xx<x+w-3;xx+=5)px(c,xx,yy,3,3,((xx*7+yy*3+Math.floor(t/1500))%11)<6?'#FFE08A':'#2E3650')});
+    if(pl==='tower'){px(c,136,4,1,14,'#333');px(c,137,4,8,5,'#F2367F')}}
+  else if(pl==='home'||pl==='park'&&s.house){const x=112;
+    if(s.house){px(c,x,46,52,GY-46,'#F4E1C1');for(let i=0;i<18;i++)px(c,x-4+i*1.5,46-i,60-i*3,1,'#C0504D');px(c,x+8,56,10,9,'#8EC5EA');px(c,x+34,56,10,9,'#8EC5EA');px(c,x+22,62,8,16,'#7A5230')}
+    else{px(c,x,30,56,GY-30,'#D7D3CF');for(let j=0;j<4;j++)for(let i=0;i<4;i++)px(c,x+5+i*13,35+j*10,8,6,'#8EC5EA');}
+    if(pl==='park')drawPark(c,t,true)}
+  if(pl==='park'&&!s.house)drawPark(c,t,false);
+  if(pl==='hospital'){px(c,104,28,70,GY-28,'#F7F7F7');px(c,104,28,70,4,'#9AC3E6');px(c,133,12,12,12,'#fff');px(c,137,14,4,8,'#E5484D');px(c,135,16,8,4,'#E5484D');for(let i=0;i<4;i++)for(let j=0;j<3;j++)px(c,109+i*16,38+j*12,9,7,'#B9DDF5')}
+  if(pl==='grave'){px(c,128,50,18,GY-50,'#9A9AA8');px(c,126,48,22,4,'#8A8A98');px(c,136,54,2,16,'#6E6E7C');px(c,122,GY-4,30,4,'#7D7D8B');[[120,'#F2367F'],[150,'#FFC93C'],[156,'#F2367F']].forEach(([x,col])=>{px(c,x,GY-6,1,6,'#3E8E41');px(c,x-1,GY-8,3,3,col)})}
+}
+function drawPark(c,t,small){const x=small?56:120;px(c,x+12,40,6,GY-40,'#7A5230');px(c,x,26,30,18,'#3E8E41');px(c,x+4,20,22,8,'#4FA35A');px(c,x+40,GY-8,22,2,'#A0522D');px(c,x+42,GY-6,2,6,'#6B3A1E');px(c,x+58,GY-6,2,6,'#6B3A1E')}
+function drawScene(c,t){
+  const se=season(),h=s.happy,dead=s.dead;
+  const skyTop=dead?'#F6A57B':h<35?'#7E8AA6':['#FFD6E5','#7FC8FF','#FFC48A','#C9D7EA'][se];
+  const skyBot=dead?'#FBD9B4':h<35?'#B2BACB':['#FFF2F7','#CFEBFF','#FFE7C9','#EEF3FA'][se];
+  const gr=c.createLinearGradient(0,0,0,GY);gr.addColorStop(0,skyTop);gr.addColorStop(1,skyBot);c.fillStyle=gr;c.fillRect(0,0,SW,GY);
+  // 太陽 or 雲
+  if(h>=55&&!dead){px(c,16,10,10,10,'#FFE36E');px(c,14,12,14,6,'#FFE36E');px(c,18,8,6,14,'#FFE36E')}
+  for(let k=0;k<3;k++){const cx=((t/90+k*70)%(SW+40))-30,cy=8+k*9;const cc=h<35?'#9AA3B5':'#FFFFFF';px(c,cx,cy,18,4,cc);px(c,cx+4,cy-3,10,4,cc)}
+  if(s.trips>0&&!dead){const ax=SW-((t/25)%(SW+30));px(c,ax,14,10,2,'#F7F7F7');px(c,ax+3,11,3,8,'#F7F7F7');px(c,ax+9,12,2,3,'#F2367F')}
+  // 地面
+  px(c,0,GY,SW,SH-GY,dead?'#8DB27E':['#8FD18A','#5DBB63','#C9A15A','#F4F7FB'][se]);px(c,0,GY,SW,2,'rgba(0,0,0,.08)');
+  // 季節のつぶ（桜・雪・落ち葉）
+  if(!dead&&se!==1)for(let k=0;k<14;k++){const fx=(k*37+t/(se===3?40:30))%SW,fy=(k*23+t/(se===3?30:45))%GY;px(c,fx,fy,se===3?2:1,se===3?2:1,se===0?'#FF9EC4':se===2?'#E07B39':'#FFFFFF')}
+  if(h<35&&!dead)for(let k=0;k<26;k++){const rx=(k*29+t/6)%SW,ry=(k*17+t/3)%GY;px(c,rx,ry,1,3,'rgba(80,110,170,.55)')}
+  const pl=sceneInfo().place;drawPlace(c,pl,t);
+  if(!dead){const ppl=scenePeople();let x=26;ppl.forEach((p,i)=>{drawPerson(c,x,p,t,i);x+=p.a<10?8:11});
+    if(s.pet){const cx=x+4;px(c,cx,GY-4,6,4,'#5A4A42');px(c,cx+5,GY-6,3,3,'#5A4A42');px(c,cx+5,GY-7,1,1,'#5A4A42');px(c,cx+7,GY-7,1,1,'#5A4A42');px(c,cx-1,GY-6,1,3,'#5A4A42')}}
+}
+let sceneRAF=0;
+function sceneLoop(t){sceneRAF=0;if(view!=='life'||!s)return;const cv=document.getElementById('scene');
+  if(cv){const c=cv.getContext('2d');c.imageSmoothingEnabled=false;drawScene(c,t)}
+  sceneRAF=requestAnimationFrame(sceneLoop)}
+function startScene(){if(!sceneRAF)sceneRAF=requestAnimationFrame(sceneLoop)}
+function sceneHtml(){
+  const si=sceneInfo();const last=[...s.log].reverse().find(l=>l.kind!=='nar');
+  const cap=last&&last.age===s.age?last.text:'';
+  return `<section class="scene o0"><canvas id="scene" width="${SW}" height="${SH}" role="img" aria-label="${s.age}歳の情景：${si.label}"></canvas>
+    <div class="scap"><span class="chip">${s.dead?'享年 '+s.age:s.age+'歳'} · ${SEASONS[season()]} · ${si.label}</span>${cap?`<span class="say">${esc(cap)}</span>`:''}</div></section>`;
+}
+
 const YEAR0=new Date().getFullYear();
 const yearOf=age=>YEAR0+(age-s.startAge);
 function avatar(){
@@ -679,6 +764,7 @@ function vLife(){
         <div class="money"><span>貯金 <b>${fmtMoney(s.money)}</b></span><span>${s.working&&s.income?'年収 <b>'+fmtMoney(s.income)+'</b>':s.retired?'年金ぐらし':s.uni?'学生':''}</span></div></section>
     </div>
     <div class="col center">
+      ${sceneHtml()}
       ${dec?`<div class="o1">${dec}</div>`:''}
       <section class="panel o6 logp"><div class="ph"><h3>人生の記録</h3><span>新しい順</span></div><ol class="log">${logHtml}</ol></section>
     </div>
@@ -822,6 +908,7 @@ async function drawCard(){
 function render(){
   app.innerHTML=view==='home'?vHome():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():vEnd();
   app.classList.toggle('wide',view==='life');
+  if(view==='life')startScene();
   if(view==='setup')syncSetup();
   if(view==='end')drawCard();
 }
