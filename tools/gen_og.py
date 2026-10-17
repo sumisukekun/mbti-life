@@ -7,10 +7,10 @@ import os, re, json, html
 from PIL import Image, ImageDraw, ImageFont
 
 BASE = 'https://mbti.businessmaker.net/'
-LANGS = ['ja', 'en', 'ko', 'zh', 'es']
-FONT_INDEX = {'ja': 0, 'en': 0, 'es': 0, 'ko': 1, 'zh': 3}
-OG_LOCALE = {'ja': 'ja_JP', 'en': 'en_US', 'ko': 'ko_KR', 'zh': 'zh_TW', 'es': 'es_ES'}
-HTML_LANG = {'ja': 'ja', 'en': 'en', 'ko': 'ko', 'zh': 'zh-Hant-TW', 'es': 'es'}
+LANGS = ['ja', 'en', 'ko', 'zh', 'es', 'fr', 'de', 'it', 'pt', 'id']
+FONT_INDEX = {'ja': 0, 'en': 0, 'es': 0, 'fr': 0, 'de': 0, 'it': 0, 'pt': 0, 'id': 0, 'ko': 1, 'zh': 3}
+OG_LOCALE = {'ja': 'ja_JP', 'en': 'en_US', 'ko': 'ko_KR', 'zh': 'zh_TW', 'es': 'es_ES', 'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'pt': 'pt_BR', 'id': 'id_ID'}
+HTML_LANG = {'ja': 'ja', 'en': 'en', 'ko': 'ko', 'zh': 'zh-Hant-TW', 'es': 'es', 'fr': 'fr', 'de': 'de', 'it': 'it', 'pt': 'pt-BR', 'id': 'id'}
 TYPES = ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP']
 
 def load(lang):
@@ -61,6 +61,30 @@ def flag(im, cc, x, y, w=60, h=40):
     elif cc == 'mx':
         d.rectangle((x, y, x + w/3, y + h), fill=(0, 104, 71)); d.rectangle((x + w/3, y, x + 2*w/3, y + h), fill='white'); d.rectangle((x + 2*w/3, y, x + w, y + h), fill=(206, 17, 38))
         r = h * .12; d.ellipse((x + w/2 - r, y + h/2 - r, x + w/2 + r, y + h/2 + r), fill=(140, 107, 42))
+    elif cc in ('fr', 'it'):
+        cols = [(0, 35, 149), 'white', (237, 41, 57)] if cc == 'fr' else [(0, 146, 70), 'white', (206, 43, 55)]
+        for k, c in enumerate(cols): d.rectangle((x + k*w/3, y, x + (k+1)*w/3, y + h), fill=c)
+    elif cc == 'de':
+        for k, c in enumerate(['black', (221, 0, 0), (255, 206, 0)]): d.rectangle((x, y + k*h/3, x + w, y + (k+1)*h/3), fill=c)
+    elif cc == 'br':
+        d.rectangle((x, y, x + w, y + h), fill=(0, 156, 59)); d.polygon([(x + w/2, y + 4), (x + w - 5, y + h/2), (x + w/2, y + h - 4), (x + 5, y + h/2)], fill=(255, 223, 0))
+        r = h * .21; d.ellipse((x + w/2 - r, y + h/2 - r, x + w/2 + r, y + h/2 + r), fill=(0, 39, 118))
+    elif cc == 'id':
+        d.rectangle((x, y, x + w, y + h/2), fill=(206, 17, 38)); d.rectangle((x, y + h/2, x + w, y + h), fill='white')
+    elif cc == 'ph':
+        d.rectangle((x, y, x + w, y + h/2), fill=(0, 56, 168)); d.rectangle((x, y + h/2, x + w, y + h), fill=(206, 17, 38)); d.polygon([(x, y), (x + w*.45, y + h/2), (x, y + h)], fill='white')
+        r = h * .09; d.ellipse((x + w*.15 - r, y + h/2 - r, x + w*.15 + r, y + h/2 + r), fill=(252, 209, 22))
+    elif cc == 'au':
+        d.rectangle((x, y, x + w, y + h), fill=(0, 0, 139)); d.rectangle((x, y, x + w/2, y + h/2), fill=(1, 33, 105))
+        d.line((x, y, x + w/2, y + h/2), fill='white', width=4); d.line((x + w/2, y, x, y + h/2), fill='white', width=4)
+        d.rectangle((x + w/4 - 3, y, x + w/4 + 3, y + h/2), fill=(200, 16, 46)); d.rectangle((x, y + h/4 - 3, x + w/2, y + h/4 + 3), fill=(200, 16, 46))
+        for sx, sy in [(.25, .75), (.75, .25), (.85, .5), (.68, .6), (.75, .82)]: d.ellipse((x + sx*w - 2, y + sy*h - 2, x + sx*w + 2, y + sy*h + 2), fill='white')
+    elif cc == 'ca':
+        d.rectangle((x, y, x + w, y + h), fill='white'); d.rectangle((x, y, x + w/4, y + h), fill=(213, 43, 30)); d.rectangle((x + 3*w/4, y, x + w, y + h), fill=(213, 43, 30))
+        d.polygon([(x + w/2, y + 6), (x + w/2 + 8, y + h/2), (x + w/2, y + h - 8), (x + w/2 - 8, y + h/2)], fill=(213, 43, 30))
+    elif cc == 'in':
+        for k, c in enumerate([(255, 153, 51), 'white', (19, 136, 8)]): d.rectangle((x, y + k*h/3, x + w, y + (k+1)*h/3), fill=c)
+        r = h * .13; d.ellipse((x + w/2 - r, y + h/2 - r, x + w/2 + r, y + h/2 + r), outline=(0, 0, 128), width=2)
     d.rectangle((x, y, x + w, y + h), outline=(200, 205, 220), width=1)
 
 def frame(acc):
@@ -99,7 +123,7 @@ def main_card(lang, path):
     b = strip(L['brand']); f = fit(d, b, lang, 'Black', 108, 760, 40)
     for dx, dy, c in [(6, 6, (150, 170, 250)), (0, 0, INK)]: d.text((80 + dx, 110 + dy), b, font=f, fill=c)
     sub = L['hero.stat']; d.text((84, 270), sub, font=fit(d, sub, lang, 'Bold', 34, 1040), fill=P)
-    for k, cc in enumerate(['jp', 'us', 'uk', 'kr', 'tw', 'es', 'mx']): flag(im, cc, 84 + k * 86, 340, 66, 44)
+    for k, cc in enumerate(['jp', 'kr', 'tw', 'id', 'ph', 'in', 'uk', 'fr', 'de', 'it', 'es', 'us', 'ca', 'mx', 'br', 'au']): flag(im, cc, 84 + k * 62, 344, 50, 34)
     x = 84
     for t in ['INTJ', 'ENFP', 'ISFJ', 'ESTP', 'INFP', 'ENTJ']:
         tw = d.textlength(t, font=F('en', 'Bold', 26)) + 30

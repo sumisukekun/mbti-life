@@ -1,8 +1,8 @@
 /* 16分の1の人生 — World Edition */
 'use strict';
-const LANGS=['ja','en','ko','zh','es'];
-const HTML_LANG={ja:'ja',en:'en',ko:'ko',zh:'zh-Hant-TW',es:'es'};
-const NUM_LOCALE={ja:'ja-JP',en:'en-US',ko:'ko-KR',zh:'zh-TW',es:'es-ES'};
+const LANGS=['ja','en','ko','zh','es','fr','de','it','pt','id'];
+const HTML_LANG={ja:'ja',en:'en',ko:'ko',zh:'zh-Hant-TW',es:'es',fr:'fr',de:'de',it:'it',pt:'pt-BR',id:'id'};
+const NUM_LOCALE={ja:'ja-JP',en:'en-US',ko:'ko-KR',zh:'zh-TW',es:'es-ES',fr:'fr-FR',de:'de-DE',it:'it-IT',pt:'pt-BR',id:'id-ID'};
 const COUNTRIES={
   jp:{lang:'ja',cur:'JPY',mult:10000,retire:63,life:3,code:'JPN',ll:[35.7,139.7]},
   us:{lang:'en',cur:'USD',mult:150,retire:66,life:-1,code:'USA',ll:[38.9,-77.0]},
@@ -10,19 +10,34 @@ const COUNTRIES={
   kr:{lang:'ko',cur:'KRW',mult:100000,retire:60,life:2,code:'KOR',ll:[37.6,127.0]},
   tw:{lang:'zh',cur:'TWD',mult:1800,retire:65,life:1,code:'TWN',ll:[25.0,121.5]},
   es:{lang:'es',cur:'EUR',mult:75,retire:66,life:2,code:'ESP',ll:[40.4,-3.7]},
-  mx:{lang:'es',cur:'MXN',mult:450,retire:65,life:-3,code:'MEX',ll:[19.4,-99.1]}};
-const CORDER=['jp','us','uk','kr','tw','es','mx'];
+  mx:{lang:'es',cur:'MXN',mult:450,retire:65,life:-3,code:'MEX',ll:[19.4,-99.1]},
+  fr:{lang:'fr',cur:'EUR',mult:80,retire:64,life:2,code:'FRA',ll:[48.9,2.35]},
+  de:{lang:'de',cur:'EUR',mult:90,retire:67,life:0,code:'DEU',ll:[52.5,13.4]},
+  it:{lang:'it',cur:'EUR',mult:70,retire:67,life:2,code:'ITA',ll:[41.9,12.5]},
+  br:{lang:'pt',cur:'BRL',mult:110,retire:65,life:-3,code:'BRA',ll:[-15.8,-47.9]},
+  id:{lang:'id',cur:'IDR',mult:150000,retire:58,life:-6,code:'IDN',ll:[-6.2,106.8]},
+  ph:{lang:'en',cur:'PHP',mult:800,retire:60,life:-7,code:'PHL',ll:[14.6,121.0]},
+  au:{lang:'en',cur:'AUD',mult:230,retire:67,life:2,code:'AUS',ll:[-33.9,151.2]},
+  ca:{lang:'en',cur:'CAD',mult:170,retire:65,life:1,code:'CAN',ll:[45.4,-75.7]},
+  in:{lang:'en',cur:'INR',mult:1500,retire:60,life:-8,code:'IND',ll:[28.6,77.2]}};
+const REGIONS=[['asia',['jp','kr','tw','id','ph','in']],['europe',['uk','fr','de','it','es']],['americas',['us','ca','mx','br']],['oceania',['au']]];
+const CORDER=REGIONS.flatMap(r=>r[1]);
 const NAMES={jp:['ゆい','はると','さくら','そうた','あおい','れん','ひな','ゆうと','めい','りく'],us:['Emma','Liam','Olivia','Noah','Ava','Ethan','Mia','Lucas','Chloe','Jack'],
   uk:['Amelia','Oliver','Isla','George','Freya','Harry','Lily','Alfie','Grace','Theo'],kr:['서연','민준','지우','도윤','하은','서준','지아','시우','수아','하준'],
   tw:['怡君','家豪','雅婷','志明','欣怡','冠宇','詠晴','宥廷','子晴','承恩'],es:['Lucía','Hugo','Martina','Mateo','Sofía','Leo','Julia','Martín','Paula','Daniel'],
-  mx:['Sofía','Santiago','Valentina','Mateo','Regina','Sebastián','Ximena','Diego','Camila','Emiliano']};
+  mx:['Sofía','Santiago','Valentina','Mateo','Regina','Sebastián','Ximena','Diego','Camila','Emiliano'],
+  fr:['Louise','Gabriel','Jade','Raphaël','Emma','Léo','Alice','Louis','Chloé','Hugo'],de:['Emilia','Noah','Mia','Matteo','Hannah','Leon','Lina','Paul','Ella','Finn'],
+  it:['Sofia','Leonardo','Aurora','Francesco','Giulia','Alessandro','Ginevra','Tommaso','Beatrice','Lorenzo'],br:['Helena','Miguel','Alice','Arthur','Laura','Gael','Manuela','Heitor','Valentina','Davi'],
+  id:['Putri','Rizky','Ayu','Fajar','Dewi','Bagus','Sari','Dimas','Nadia','Arif'],ph:['Maria','Juan','Angel','Jose','Andrea','Mark','Nicole','Paolo','Bea','Miguel'],
+  au:['Charlotte','Oliver','Isla','Jack','Amelia','William','Mia','Noah','Ava','Henry'],ca:['Olivia','Liam','Emma','Noah','Charlotte','Jacob','Amélie','William','Maya','Benjamin'],
+  in:['Ananya','Aarav','Diya','Vihaan','Saanvi','Arjun','Aadhya','Reyansh','Ishita','Kabir']};
 
 /* ---------- 言語・国 ---------- */
 const qs=new URLSearchParams(location.search);
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
 function detectLang(){const n=(navigator.language||'ja').toLowerCase();for(const l of LANGS)if(n.startsWith(l))return l;return 'en'}
 let lang=qs.get('lang')||ls('mbtiLang')||detectLang();if(!LANGS.includes(lang)||!I18N[lang])lang=I18N[lang]?lang:'ja';
-let COUNTRY=qs.get('c')||ls('mbtiCountry')||({ja:'jp',en:'us',ko:'kr',zh:'tw',es:'es'}[lang]);if(!COUNTRIES[COUNTRY])COUNTRY='jp';
+let COUNTRY=qs.get('c')||ls('mbtiCountry')||({ja:'jp',en:'us',ko:'kr',zh:'tw',es:'es',fr:'fr',de:'de',it:'it',pt:'br',id:'id'}[lang]);if(!COUNTRIES[COUNTRY])COUNTRY='jp';
 function tr(k,p){const D=I18N[lang]||{};let v=D[k];if(v==null)v=I18N.ja[k];if(v==null)return k;
   return p?v.replace(/\{(\w+)\}/g,(m,x)=>p[x]==null?m:rv(p[x])):v}
 function rv(v){if(v&&typeof v==='object')return tr(v.k,v.p);if(typeof v==='string'&&v[0]==='@')return tr(v.slice(1));return v}
@@ -348,13 +363,13 @@ function drawGlobe(cv,t){
   for(let la=-75;la<=75;la+=10){const n=Math.max(6,Math.round(36*Math.cos(la*rad)));for(let i=0;i<n;i++){const [x,y,z]=P(la,i*360/n);if(z<=0)continue;
     c.globalAlpha=.15+z*.55;c.fillStyle=G.dot;c.beginPath();c.arc(x,y,1.4+z*1.2,0,7);c.fill()}}
   c.globalAlpha=1;
-  const pins=CORDER.map(cc=>{const [la,lo]=COUNTRIES[cc].ll;const [x,y,z]=P(la,lo);return {cc,x,y,z}}).sort((a,b)=>a.z-b.z);
+  const lon0f=lon0;const pins=CORDER.map(cc=>{const [la,lo]=COUNTRIES[cc].ll;const [x,y,z]=P(la,lo);return {cc,x,y,z}}).sort((a,b)=>a.z-b.z);
   c.font=`700 ${Math.round(W/30)}px ${getComputedStyle(document.body).fontFamily}`;c.textBaseline='middle';
   for(const p of pins){if(p.z<=-0.05)continue;const on=p.cc===COUNTRY;const a=Math.min(1,p.z*2+.25);c.globalAlpha=a;
     if(on){const pr=8+((t/40)%18);c.strokeStyle=G.pink;c.lineWidth=2;c.globalAlpha=a*(1-((t/40)%18)/18);c.beginPath();c.arc(p.x,p.y,pr,0,7);c.stroke();c.globalAlpha=a}
     c.fillStyle=on?G.pink:G.ink;c.beginPath();c.arc(p.x,p.y,on?6:4,0,7);c.fill();
-    const lb=CN(p.cc);const tw=c.measureText(lb).width+14;c.fillStyle=on?G.pink:G.ink;
-    c.beginPath();c.roundRect(p.x+8,p.y-11,tw,22,11);c.fill();c.fillStyle=G.card;c.fillText(lb,p.x+15,p.y+1)}
+    if(on){const lb=CN(p.cc);const tw=c.measureText(lb).width+14;c.fillStyle=G.pink;
+    c.beginPath();c.roundRect(p.x+8,p.y-11,tw,22,11);c.fill();c.fillStyle=G.card;c.fillText(lb,p.x+15,p.y+1)}}
   c.globalAlpha=1;
 }
 
@@ -368,6 +383,15 @@ function flag(cc){
   if(cc==='tw')b=`<rect width="30" height="20" fill="#FE0000"/><rect width="15" height="10" fill="#000095"/><circle cx="7.5" cy="5" r="2.6" fill="#fff"/><circle cx="7.5" cy="5" r="1.8" fill="#000095"/><circle cx="7.5" cy="5" r="1.5" fill="#fff"/>`;
   if(cc==='es')b=`<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>`;
   if(cc==='mx')b=`<rect width="10" height="20" fill="#006847"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE1126"/><circle cx="15" cy="10" r="2.4" fill="#8C6B2A"/>`;
+  if(cc==='fr')b=`<rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ED2939"/>`;
+  if(cc==='de')b=`<rect width="30" height="7" fill="#000"/><rect y="6.6" width="30" height="7" fill="#DD0000"/><rect y="13.3" width="30" height="6.7" fill="#FFCE00"/>`;
+  if(cc==='it')b=`<rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/>`;
+  if(cc==='br')b=`<rect width="30" height="20" fill="#009C3B"/><path d="M15 2.5L27 10L15 17.5L3 10Z" fill="#FFDF00"/><circle cx="15" cy="10" r="4.2" fill="#002776"/><path d="M11 9.2q4-1.6 8 .6" stroke="#fff" stroke-width=".8" fill="none"/>`;
+  if(cc==='id')b=`<rect width="30" height="10" fill="#CE1126"/><rect y="10" width="30" height="10" fill="#fff"/>`;
+  if(cc==='ph')b=`<rect width="30" height="10" fill="#0038A8"/><rect y="10" width="30" height="10" fill="#CE1126"/><path d="M0 0L14 10L0 20Z" fill="#fff"/><circle cx="4.6" cy="10" r="1.8" fill="#FCD116"/>`;
+  if(cc==='au')b=`<rect width="30" height="20" fill="#00008B"/><g transform="scale(.5)"><path d="M0 0L30 20M30 0L0 20" stroke="#fff" stroke-width="4"/><path d="M15 0V20M0 10H30" stroke="#fff" stroke-width="6"/><path d="M15 0V20M0 10H30" stroke="#C8102E" stroke-width="3.4"/></g><circle cx="7.5" cy="15" r="2" fill="#fff"/><circle cx="22" cy="5" r="1" fill="#fff"/><circle cx="25" cy="10" r="1" fill="#fff"/><circle cx="20" cy="12" r="1" fill="#fff"/><circle cx="22" cy="16.5" r="1" fill="#fff"/>`;
+  if(cc==='ca')b=`<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="M15 4l1.2 2.4 1.6-.6-.5 3.2 2-1.4.5 1.4 1.6-.2-1 2 .8.6-3.4 2.4.4 1.4-2.4-.4V17h-.6v-2.2l-2.4.4.4-1.4-3.4-2.4.8-.6-1-2 1.6.2.5-1.4 2 1.4-.5-3.2 1.6.6Z" fill="#D52B1E"/>`;
+  if(cc==='in')b=`<rect width="30" height="6.7" fill="#FF9933"/><rect y="6.6" width="30" height="6.8" fill="#fff"/><rect y="13.3" width="30" height="6.7" fill="#138808"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".7"/><circle cx="15" cy="10" r=".6" fill="#000080"/>`;
   return `<svg class="flag" viewBox="0 0 ${W} ${H}" aria-hidden="true">${b}</svg>`;
 }
 
@@ -388,12 +412,12 @@ function vHome(){
     <figure class="globe"><canvas id="globe" width="520" height="520" aria-hidden="true"></canvas><figcaption>${esc(tr('home.globe'))}</figcaption></figure>
   </header>
   <section class="sec"><div class="sech"><span class="stepn">01</span><h2>${esc(tr('home.country'))}</h2></div><p class="note">${esc(tr('home.countryNote'))}</p>
-    <div class="cgrid">${CORDER.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></section>
+    ${REGIONS.map(([r,list])=>`<div class="region"><span class="rlabel">${esc(tr('home.region.'+r))}</span><div class="cgrid">${list.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></div>`).join('')}</section>
   <section class="sec"><div class="sech"><span class="stepn">02</span><h2>${esc(tr('home.type'))}</h2></div>
     <div class="grid16">${ORDER.map(t=>`<button class="tbtn ${grp(t)}" data-type="${t}"><b>${t}</b><span>${esc(tr('type.'+t+'.n'))}</span></button>`).join('')}</div></section>
   <div class="or">${esc(tr('home.or'))}</div>
   <div class="quizcta dots"><p><b>${esc(tr('home.quizQ'))}</b><br>${esc(tr('home.quizSub'))}</p><button class="btn" data-act="quiz">${esc(tr('home.quizBtn'))}</button></div>
-  <p class="note">${esc(tr('home.note'))}</p>`;
+  <p class="note">${esc(tr('home.note'))}</p>${footer()}`;
 }
 function vQuiz(){
   const n=qi+1;
@@ -571,7 +595,18 @@ function starStr(n){return '★'.repeat(n)+'☆'.repeat(5-n)}
 const RATES=['work','money','love','health'];
 
 /* ---------- シェア ---------- */
-const TIP_URL=''; // 投げ銭ページのURL（OFUSE / Ko-fi など）
+/* 収益化の設定：ここに入れるだけで表示される */
+const TIP_URLS={ja:'',other:''};          // 投げ銭：ja=OFUSE など / other=Ko-fi など（空なら非表示）
+const ADSENSE={client:'',slot:''};        // 広告：AdSense の ca-pub-… と広告ユニットID（空なら非表示）
+const CONTACT_URL='https://businessmaker.net/';
+const tipUrl=()=>lang==='ja'?(TIP_URLS.ja||TIP_URLS.other):(TIP_URLS.other||TIP_URLS.ja);
+function tipBox(){const u=tipUrl();return u?`<div class="tipbox"><div><b>${esc(tr('tip.h'))}</b><p>${esc(tr('tip.p'))}</p></div><a class="btn pinkbtn" href="${esc(u)}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a></div>`:''}
+function footer(){return `<footer class="foot">${tipUrl()?`<a href="${esc(tipUrl())}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a>`:''}<a href="privacy.html">${esc(tr('foot.privacy'))}</a><a href="${CONTACT_URL}" target="_blank" rel="noopener">${esc(tr('foot.contact'))}</a><span>© BusinessMaker</span></footer>`}
+let adLoaded=false;
+function syncAd(){const w=document.getElementById('adwrap');if(!w)return;const show=!!(ADSENSE.client&&ADSENSE.slot)&&['home','end','friend'].includes(view)&&!shareOpen;
+  w.hidden=!show;if(!show)return;w.querySelector('.adl').textContent=tr('ad.label');
+  if(!adLoaded){adLoaded=true;const sc=document.createElement('script');sc.async=true;sc.crossOrigin='anonymous';sc.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+ADSENSE.client;document.head.appendChild(sc);
+    const ins=w.querySelector('ins');ins.setAttribute('data-ad-client',ADSENSE.client);ins.setAttribute('data-ad-slot',ADSENSE.slot);(window.adsbygoogle=window.adsbygoogle||[]).push({})}}
 const SHARE_URL='https://mbti.businessmaker.net/';
 function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
@@ -690,8 +725,9 @@ function vEnd(){
     <button class="btn" data-act="again">${esc(tr('rec.again'))}</button>
   </div>
   <button class="quick" data-act="home">${esc(tr('rec.other'))}</button>
-  ${TIP_URL?`<div class="quizcta dots"><p><b>${esc(tr('tip.h'))}</b><br>${esc(tr('tip.p'))}</p><a class="btn" style="text-decoration:none" href="${TIP_URL}" target="_blank" rel="noopener">${esc(tr('tip.btn'))}</a></div>`:''}
+  ${tipBox()}
   <p class="note">${esc(tr('rec.note'))}</p>
+  ${footer()}
   ${shareOpen?vShare():''}`;
 }
 function vShare(){
@@ -711,7 +747,7 @@ function vShare(){
   </div></div>`;
 }
 function updShareLinks(){const x=document.getElementById('shx'),t=document.getElementById('shth');if(x)x.href=xUrl();if(t)t.href=threadsUrl()}
-const FONTS={ja:['"Dela Gothic One"','"Zen Kaku Gothic New"'],en:['"Dela Gothic One"','"Zen Kaku Gothic New"'],es:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ko:['"Black Han Sans"','"Noto Sans KR"'],zh:['"Noto Sans TC"','"Noto Sans TC"']};
+const FONTS={fr:['"Dela Gothic One"','"Zen Kaku Gothic New"'],de:['"Dela Gothic One"','"Zen Kaku Gothic New"'],it:['"Dela Gothic One"','"Zen Kaku Gothic New"'],pt:['"Dela Gothic One"','"Zen Kaku Gothic New"'],id:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ja:['"Dela Gothic One"','"Zen Kaku Gothic New"'],en:['"Dela Gothic One"','"Zen Kaku Gothic New"'],es:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ko:['"Black Han Sans"','"Noto Sans KR"'],zh:['"Noto Sans TC"','"Noto Sans TC"']};
 async function drawCard(){
   const img=document.getElementById('cardimg');if(!img)return;
   const F=FONTS[lang]||FONTS.ja;const DW=lang==='zh'?'900 ':'';
@@ -756,6 +792,7 @@ function render(){
   document.body.classList.toggle('dark-stage',view==='finale');
   if(view==='setup')syncSetup();
   if(view==='end'&&shareOpen)drawCard();
+  syncAd();
   startLoop();
 }
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,1800)}
