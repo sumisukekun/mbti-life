@@ -43,7 +43,7 @@ function tr(k,p){const D=I18N[lang]||{};let v=D[k];if(v==null)v=I18N.ja[k];if(v=
 function rv(v){if(v&&typeof v==='object')return tr(v.k,v.p);if(typeof v==='string'&&v[0]==='@')return tr(v.slice(1));return v}
 const CN=c=>tr('country.'+c);
 const SEP=()=>tr('_sep');
-function q(t){return (lang==='ja'||lang==='zh')?'「'+t+'」':'“'+t+'”'}
+function q(t){return (lang==='ja'||lang==='zh')?'「'+t+'」':lang==='de'?'„'+t+'“':lang==='fr'?'« '+t+' »':'“'+t+'”'}
 function applyLang(){document.documentElement.lang=HTML_LANG[lang];document.title=tr('meta.title');ls('mbtiLang',lang);ls('mbtiCountry',COUNTRY)}
 function langName(l){return (I18N[l]||{})['lang.name']||l}
 

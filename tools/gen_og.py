@@ -23,7 +23,7 @@ GRPC = {'nt': (45, 87, 240), 'nf': (242, 54, 127), 'sj': (31, 157, 107), 'sp': (
 
 def grp(t): return ('nt' if t[2] == 'T' else 'nf') if t[1] == 'N' else ('sj' if t[3] == 'J' else 'sp')
 def strip(s): return re.sub(r'<[^>]+>', '', s)
-def quote(lang, s): return f'「{s}」' if lang in ('ja', 'zh') else f'“{s}”'
+def quote(lang, s): return f'「{s}」' if lang in ('ja', 'zh') else f'„{s}“' if lang == 'de' else f'« {s} »' if lang == 'fr' else f'“{s}”'
 
 def F(lang, w, size):
     return ImageFont.truetype(f'/usr/share/fonts/opentype/noto/NotoSansCJK-{w}.ttc', size, index=FONT_INDEX[lang])

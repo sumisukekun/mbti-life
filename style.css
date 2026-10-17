@@ -308,3 +308,5 @@ body.dark-stage{background:#0E1018}
 .foot a{color:var(--muted)}
 .adwrap{margin-top:20px;display:flex;flex-direction:column;gap:4px;min-height:100px}
 .adl{font-size:10px;color:var(--muted);letter-spacing:.1em}
+.mslist li{grid-template-columns:minmax(3.4em,max-content) 1fr;column-gap:14px}
+.mslist li span{white-space:nowrap}
