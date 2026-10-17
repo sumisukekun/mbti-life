@@ -596,7 +596,7 @@ const RATES=['work','money','love','health'];
 
 /* ---------- シェア ---------- */
 /* 収益化の設定：ここに入れるだけで表示される */
-const TIP_URLS={ja:'',other:''};          // 投げ銭：ja=OFUSE など / other=Ko-fi など（空なら非表示）
+const TIP_URLS={ja:'',other:'https://ko-fi.com/businessmaker'};          // 投げ銭：ja=OFUSE など / other=Ko-fi など（空なら非表示）
 const ADSENSE={client:'ca-pub-4478590779171256',slot:''};        // 広告：AdSense の ca-pub-… と広告ユニットID（空なら非表示）
 const CONTACT_URL='https://businessmaker.net/';
 const tipUrl=()=>lang==='ja'?(TIP_URLS.ja||TIP_URLS.other):(TIP_URLS.other||TIP_URLS.ja);
