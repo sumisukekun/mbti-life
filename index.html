@@ -512,6 +512,7 @@ function vLife(){
   ${ch}
   <ul class="log">${s.log.slice().reverse().map(l=>`<li class="${l.kind==='ms'?'ms':''}"><span class="y">${l.age}歳</span><span class="t">${l.kind==='up'?'<span class="tag up">UP</span>':l.kind==='dn'?'<span class="tag dn">DOWN</span>':''}${esc(l.text)}</span></li>`).join('')}</ul>`;
 }
+const TITLES=["一代で会社を育てた人","大家族に囲まれた人","長生きのレジェンド","世界を見てきた旅人","その道を極めた人","たくさんの人に愛された人","お金には困らなかった人","毎日がちょっと楽しかった人","挑戦をおそれなかった人","ふつうで、かけがえのない人"];
 function title(){
   if(s.founder&&s.startup&&s.money>4000)return '一代で会社を育てた人';
   if(s.kids>=2&&s.grand>=1&&s.love>65)return '大家族に囲まれた人';
@@ -553,7 +554,7 @@ function keywords(){
 function curve(n){const h=s.hist.length?s.hist:[s.happy];const o=[];for(let i=0;i<n;i++)o.push(h[Math.floor(i*(h.length-1)/(n-1||1))]);return o}
 function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n)}
 function shareData(){return {t:s.type,a:s.age,ti:title(),r:ratings(),kw:keywords(),c:curve(24)}}
-function resultUrl(){return BASE+'?r='+enc(shareData())}
+function resultUrl(){const i=Math.max(0,TITLES.indexOf(title()));return SHARE_URL+'r/'+s.type+'-'+i+'/?r='+enc(shareData())}
 function xText(){
   return `${s.type}の私の一生は「${title()}」\n享年${s.age}／キーワードは「${keywords().join('・')}」\n\nあなたのMBTIは、どんな一生？\n#16分の1の人生 #MBTI`;
 }
