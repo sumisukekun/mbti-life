@@ -6,15 +6,15 @@
 <title>16分の1の人生｜MBTIで人生シミュレーション</title>
 <meta name="description" content="あなたのMBTIタイプで、ひとりの人生を18歳から最期まで早送り。享年と称号が出る人生シミュレーションゲーム。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://sumisukekun.github.io/mbti-life/">
+<meta property="og:url" content="https://mbti.businessmaker.net/">
 <meta property="og:title" content="16分の1の人生｜あなたのMBTIは、どんな一生？">
 <meta property="og:description" content="MBTIタイプで18歳から最期までの人生を早送り。享年と称号をXでシェアしよう。">
-<meta property="og:image" content="https://sumisukekun.github.io/mbti-life/ogp.png">
+<meta property="og:image" content="https://mbti.businessmaker.net/ogp.png">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="16分の1の人生｜あなたのMBTIは、どんな一生？">
 <meta name="twitter:description" content="MBTIタイプで18歳から最期までの人生を早送り。享年と称号をXでシェアしよう。">
-<meta name="twitter:image" content="https://sumisukekun.github.io/mbti-life/ogp.png">
+<meta name="twitter:image" content="https://mbti.businessmaker.net/ogp.png">
 <meta name="theme-color" content="#EDEFF5">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
@@ -515,12 +515,12 @@ function title(){
   return 'ふつうで、かけがえのない人';
 }
 const TIP_URL=''; // 投げ銭ページのURL（OFUSE / Ko-fi など）を入れると結果画面に応援ボタンが出る
-const SHARE_URL='https://sumisukekun.github.io/mbti-life/';
+const SHARE_URL='https://mbti.businessmaker.net/';
 function hook(){
   const m=s.ms.filter(x=>!/として働き始めた|大学に進学/.test(x[1]));
   return m.length?m.slice(-2).map(x=>x[0]+'歳で'+x[1]).join('、'):'大きな事件のない穏やかな人生';
 }
-const BASE=/^https?:/.test(location.protocol)&&location.hostname.endsWith('github.io')?location.origin+location.pathname:SHARE_URL;
+const BASE=/^https?:/.test(location.protocol)&&/github\.io$|businessmaker\.net$/.test(location.hostname)?location.origin+location.pathname:SHARE_URL;
 function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
 function hl3(){return s.ms.filter(x=>!/として働き始めた|大学に進学/.test(x[1])).slice(-3)}
