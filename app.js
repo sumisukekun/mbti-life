@@ -597,7 +597,7 @@ const RATES=['work','money','love','health'];
 /* ---------- シェア ---------- */
 /* 収益化の設定：ここに入れるだけで表示される */
 const TIP_URLS={ja:'',other:''};          // 投げ銭：ja=OFUSE など / other=Ko-fi など（空なら非表示）
-const ADSENSE={client:'',slot:''};        // 広告：AdSense の ca-pub-… と広告ユニットID（空なら非表示）
+const ADSENSE={client:'ca-pub-4478590779171256',slot:''};        // 広告：AdSense の ca-pub-… と広告ユニットID（空なら非表示）
 const CONTACT_URL='https://businessmaker.net/';
 const tipUrl=()=>lang==='ja'?(TIP_URLS.ja||TIP_URLS.other):(TIP_URLS.other||TIP_URLS.ja);
 function tipBox(){const u=tipUrl();return u?`<div class="tipbox"><div><b>${esc(tr('tip.h'))}</b><p>${esc(tr('tip.p'))}</p></div><a class="btn pinkbtn" href="${esc(u)}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a></div>`:''}
