@@ -139,6 +139,23 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .imgcard{width:100%;border-radius:14px;border:1.5px solid var(--line);display:block;aspect-ratio:1200/675;background:var(--card)}
 .steps{margin:0;padding-left:1.3em;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
 .quick{background:none;border:none;color:var(--blue);text-decoration:underline;padding:4px 0;font-size:14px}
+.setup{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field>span{font-weight:700;font-size:14px}
+.agebox{display:flex;align-items:center;gap:14px}
+.agebox output{font-family:var(--display);font-size:34px;min-width:2.4em;line-height:1}
+.agebox input{flex:1;min-width:0;accent-color:var(--pink)}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;border:2px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;background:var(--paper);cursor:pointer}
+.seg input:checked+span{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.seg input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.seg input:disabled+span{opacity:.35;cursor:not-allowed}
+.friendcta{background:var(--ink);color:var(--paper);border-radius:20px;padding:22px 20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.friendcta h3{margin:0;font-size:20px}
+.friendcta p{margin:0;font-size:14px;opacity:.85}
+.friendcta .btn{background:var(--pink);border-color:var(--pink);color:#fff;box-shadow:4px 4px 0 var(--blue)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-size:13px;z-index:20}
 .sec{display:flex;flex-direction:column;gap:10px}
 .sec h3{margin:0;font-size:15px}
@@ -267,7 +284,7 @@ function newLife(type){
   const t={};for(const c of 'EISNTFJP')t[c]=type.includes(c);
   return {type,t,age:18,money:30,health:clamp(80+Math.round(R()*15)),love:35+Math.round(R()*15),career:5,happy:60,
     partner:false,married:false,kids:0,job:null,uni:false,working:false,retired:false,founder:false,house:false,
-    trips:0,grand:0,ms:[],log:[],counts:{},dead:false};
+    trips:0,grand:0,ms:[],log:[],counts:{},dead:false,startAge:18,gradAge:22};
 }
 function weight(e){
   if(s.age<e.a[0]||s.age>e.a[1])return 0;
@@ -304,9 +321,10 @@ function step(){
   if(pending||s.dead)return;
   s.age++;
   yearly();
-  if(s.age===22&&s.uni){s.uni=false;startJob(false)}
-  else if(s.age===19&&!s.working&&!s.uni){startJob(true)}
-  else if(s.age===(s.founder?70:63)&&s.working){s.working=false;s.retired=true;ms(s,s.founder?'会社を後進に託して引退':'定年退職した');push(s.founder?'会社を後進に託し、引退した。':'定年退職。花束をもらった。','ms')}
+  if(s.age===18&&!s.decided18&&!s.uni&&!s.working){pending=uniChoice();if(!autoSkip)stop();else{const i=pending.o.findIndex(o=>s.t[o.lean]);resolve(i<0?0:i)}return}
+  if(s.uni&&s.age>=s.gradAge){s.uni=false;startJob(false)}
+  else if(s.age>=19&&s.age<60&&!s.working&&!s.uni&&!s.retired&&R()<.5){startJob(s.age<23)}
+  else if(s.age>=(s.founder?70:63)&&s.working){s.working=false;s.retired=true;ms(s,s.founder?'会社を後進に託して引退':'定年退職した');push(s.founder?'会社を後進に託し、引退した。':'定年退職。花束をもらった。','ms')}
   let n=R()<.8?1:0; if(R()<.28)n++;
   let any=false;
   for(let i=0;i<n;i++){
@@ -361,8 +379,58 @@ function vCard(type,fromQuiz){
   <div class="tcard"><div class="code">${type}</div><h2>${T.n}</h2><p>${T.d}</p>
   <div class="axes">${[...type].map(c=>`<div><b>${c}</b>${lab[c]}</div>`).join('')}</div></div>
   <p>この性格のまま生きたら、どんな人生になる？ ときどき訪れる分かれ道は、あなたが選べます。</p>
-  <div class="row"><button class="btn" data-act="begin" data-type="${type}">人生をはじめる</button><button class="btn ghost" data-act="home">タイプを変える</button></div>
+  <div class="row"><button class="btn" data-act="setup" data-type="${type}">この性格で未来を見る</button><button class="btn ghost" data-act="home">タイプを変える</button></div>`;
+}
+let prof={age:20,rel:'single',kids:0,work:'student'};
+try{const v=JSON.parse(localStorage.getItem('mbtiLifeProfile')||'null');if(v&&v.age)prof=v}catch(e){}
+function radios(name,opts,cur){return `<div class="seg">${opts.map(o=>`<label><input type="radio" name="${name}" id="${name}-${o[0]}" value="${o[0]}" ${o[0]==cur?'checked':''}><span>${o[1]}</span></label>`).join('')}</div>`}
+function vSetup(type){
+  return `<span class="eyebrow">${type} ・ ${TYPES[type].n}</span>
+  <h2 class="riso" style="margin:0;font-size:26px">いまのあなたを教えて</h2>
+  <p style="margin:0;color:var(--muted)">今日の年齢と状況からスタートして、この先の人生を早送りします。</p>
+  <form class="setup" id="setupform">
+    <div class="field"><span>いまの年齢</span><div class="agebox"><output id="ageout">${prof.age}</output><input type="range" id="age" min="15" max="80" value="${prof.age}" aria-label="いまの年齢"></div></div>
+    <div class="field"><span>恋愛・結婚</span>${radios('rel',[['single','ひとり'],['partner','恋人がいる'],['married','結婚している']],prof.rel)}</div>
+    <div class="field"><span>子ども</span>${radios('kids',[[0,'いない'],[1,'1人'],[2,'2人'],[3,'3人以上']],prof.kids)}</div>
+    <div class="field"><span>いまの状況</span>${radios('work',[['student','学生'],['work','働いている'],['none','働いていない']],prof.work)}</div>
+  </form>
+  <div class="row"><button class="btn" data-act="begin" data-type="${type}">人生を早送りする</button></div>
   <button class="quick" data-act="quick" data-type="${type}">待てない人は → 一瞬で最期まで見る</button>`;
+}
+function readSetup(){
+  const f=document.getElementById('setupform');if(!f)return prof;
+  const v=n=>(f.querySelector(`input[name="${n}"]:checked`)||{}).value;
+  prof={age:+document.getElementById('age').value,rel:v('rel')||'single',kids:+(v('kids')||0),work:v('work')||'student'};
+  if(prof.age<18){prof.rel=prof.rel==='married'?'single':prof.rel;prof.kids=0;prof.work='student'}
+  try{localStorage.setItem('mbtiLifeProfile',JSON.stringify(prof))}catch(e){}
+  return prof;
+}
+function syncSetup(){
+  const f=document.getElementById('setupform');if(!f)return;const age=+document.getElementById('age').value;
+  document.getElementById('ageout').textContent=age;
+  const young=age<18;
+  ['rel-married','kids-1','kids-2','kids-3','work-work','work-none'].forEach(id=>{const el=document.getElementById(id);if(el){el.disabled=young;if(young&&el.checked){el.checked=false}}});
+  if(young){document.getElementById('kids-0').checked=true;document.getElementById('work-student').checked=true;if(!f.querySelector('input[name="rel"]:checked'))document.getElementById('rel-single').checked=true}
+}
+function uniChoice(){return {t:'高校卒業。この先どうする？',o:[
+  {l:'大学に進む',lean:'N',fx:x=>{x.decided18=true;x.uni=true;x.gradAge=22;ms(x,'大学に進学');return '大学に進学した。'}},
+  {l:'すぐに働く',lean:'S',fx:x=>{x.decided18=true;add(x,'happy',3);startJob(true);return '社会に出ることを選んだ。'}}]}}
+function startLife(type,p){
+  s=newLife(type);s.age=p.age;s.startAge=p.age;
+  const y=Math.max(0,p.age-22);
+  s.money=Math.round(30+y*55*(0.6+R()*0.7));
+  s.health=clamp(s.health-Math.max(0,p.age-40)*0.8);
+  push(`${p.age}歳の今日から、${type}の人生を早送りする。`,'ms');
+  if(p.rel!=='single'){s.partner=true;add(s,'love',15)}
+  if(p.rel==='married'){s.married=true;add(s,'love',10)}
+  s.kids=p.kids;if(p.kids&&p.age>55)s.kidsOut=true;
+  if(p.age>18)s.decided18=true;
+  if(p.work==='student'&&p.age>=18){s.uni=true;s.gradAge=Math.max(22,p.age+1)}
+  if(p.work==='work'){
+    if(p.age>=63){s.retired=true}else{const g=grp(type);s.job=pick(JOBS[g]);s.working=true;s.career=clamp(20+y*1.5);push(`いまは${s.job}として働いている。`,'')}
+  }
+  if(p.work==='none'&&p.age>=63)s.retired=true;
+  if(p.age===18)pending=uniChoice();
 }
 function bar(label,v,color){return `<div class="bar"><span>${label}</span><span class="tr"><i style="width:${v}%;background:${color}"></i></span><span class="v">${Math.round(v)}</span></div>`}
 function vLife(){
@@ -394,19 +462,35 @@ function hook(){
   const m=s.ms.filter(x=>!/として働き始めた|大学に進学/.test(x[1]));
   return m.length?m.slice(-2).map(x=>x[0]+'歳で'+x[1]).join('、'):'大きな事件のない穏やかな人生';
 }
+const BASE=/^https?:/.test(location.protocol)&&location.hostname.endsWith('github.io')?location.origin+location.pathname:SHARE_URL;
+function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
+function hl3(){return s.ms.filter(x=>!/として働き始めた|大学に進学/.test(x[1])).slice(-3)}
+function resultUrl(){return BASE+'?r='+enc({t:s.type,a:s.age,s:s.startAge,ti:title(),j:s.job||'',k:s.kids,m:s.married?1:0,mo:Math.round(s.money),h:hl3()})}
 function xText(){
-  return `${s.type}の私、享年${s.age}。\n称号は「${title()}」\n${hook()}。\n\nあなたのMBTIはどんな一生？\n#16分の1の人生 #MBTI`;
+  return `いま${s.startAge}歳の${s.type}の私、享年${s.age}。\n称号は「${title()}」\n${hook()}。\n\nあなたのMBTIはどんな一生？\n#16分の1の人生 #MBTI`;
 }
-function xUrl(){return 'https://x.com/intent/post?text='+encodeURIComponent(xText())+'&url='+encodeURIComponent(SHARE_URL)}
+function xUrl(){return 'https://x.com/intent/post?text='+encodeURIComponent(xText())+'&url='+encodeURIComponent(resultUrl())}
 function shareText(){
-  return xText()+'\n'+SHARE_URL;
+  return xText()+'\n'+resultUrl();
+}
+let friend=null;
+try{const r=new URLSearchParams(location.search).get('r');const o=r&&dec(r);if(o&&TYPES[o.t]&&+o.a>0){friend=o;view='friend'}}catch(e){}
+function vFriend(){
+  const f=friend,n=v=>Math.max(0,Math.round(+v||0));
+  const hs=Array.isArray(f.h)?f.h.slice(0,3):[];
+  return `<span class="eyebrow">シェアされた人生</span>
+  <div class="grave dots"><span class="eyebrow">${f.t} ・ ${TYPES[f.t].n}</span><span class="span">${n(f.s)}歳から早送り ・ 享年 ${n(f.a)}</span><h2 class="riso">${esc(String(f.ti||'').slice(0,30))}</h2>
+  <div class="facts"><div>職業<b>${esc(String(f.j||'—').slice(0,30))}</b></div><div>最終貯金<b>${fmtMoney(+f.mo||0)}</b></div><div>家族<b>${f.m?'結婚':'独身'}</b></div><div>子ども<b>${n(f.k)}人</b></div></div></div>
+  ${hs.length?`<section class="sec"><h3>この人生のハイライト</h3><ul class="mslist">${hs.map(m=>`<li><span>${n(m[0])}歳</span>${esc(String(m[1]).slice(0,40))}</li>`).join('')}</ul></section>`:''}
+  <div class="friendcta"><h3>あなたのMBTIだと、どんな一生？</h3><p>いまの年齢と状況を入れて、未来を早送り。1分で結果が出ます。</p><button class="btn" data-act="home">自分の人生を見る</button></div>`;
 }
 function shareTextOld(){
   return `#16分の1の人生\n${s.type}（${TYPES[s.type].n}）の私は、${s.age}歳まで生きて「${title()}」になった。\n職業：${s.job||'—'}／${s.married?'結婚':'独身'}${s.kids?'・子ども'+s.kids+'人':''}／最終貯金 ${fmtMoney(s.money)}\nあなたのタイプは、どんな一生？`;
 }
 function vEnd(){
   const rel=s.married?'結婚して添い遂げた':s.ms.some(m=>m[1]==='離婚した')?'離婚を経験':s.partner?'恋人と過ごした':'ひとりの時間を愛した';
-  return `<div class="grave dots"><span class="eyebrow">${s.type} ・ ${TYPES[s.type].n}</span><span class="span">享年 ${s.age}</span><h2 class="riso">${title()}</h2>
+  return `<div class="grave dots"><span class="eyebrow">${s.type} ・ ${TYPES[s.type].n}</span><span class="span">${s.startAge}歳から早送り ・ 享年 ${s.age}</span><h2 class="riso">${title()}</h2>
   <div class="facts"><div>職業<b>${esc(s.job||'—')}</b></div><div>最終貯金<b>${fmtMoney(s.money)}</b></div><div>家族<b>${rel}</b></div><div>子ども / 孫<b>${s.kids}人 / ${s.grand}人</b></div></div></div>
   <section class="sec"><h3>人生のハイライト</h3><ul class="mslist">${s.ms.map(m=>`<li><span>${m[0]}歳</span>${esc(m[1])}</li>`).join('')||'<li><span>—</span>大きな事件のない、穏やかな人生</li>'}</ul></section>
   <section class="sec"><h3>Xでシェア</h3>
@@ -415,7 +499,7 @@ function vEnd(){
   <ol class="steps"><li>「画像を保存」（スマホは画像を長押しでも可）</li><li>「Xでポスト」を押して、保存した画像を添付</li></ol>
   <div class="row"><a class="xbtn" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>Xでポスト</a><button class="btn small ghost" data-act="copy">文章をコピー</button></div>
   <textarea class="share" id="sharebox" rows="6" readonly>${esc(shareText())}</textarea></section>
-  <div class="row"><button class="btn" data-act="begin" data-type="${s.type}">同じタイプでもう一度</button><button class="btn ghost" data-act="home">別のタイプで</button></div>
+  <div class="row"><button class="btn" data-act="begin" data-type="${s.type}">同じ条件でもう一度</button><button class="btn ghost" data-act="home">別のタイプで</button></div>
   <p class="note">同じタイプでも、人生は毎回ちがいます。</p>`;
 }
 let cardType=null,cardFromQuiz=false;
@@ -433,7 +517,7 @@ async function drawCard(){
   // type code with misregistration
   g.font='150px '+D;g.textBaseline='alphabetic';
   g.fillStyle='rgba(45,87,240,.55)';g.fillText(s.type,84,224);g.fillStyle=P;g.fillText(s.type,78,218);
-  g.fillStyle=MUTED;g.font='500 26px '+BD;g.fillText(TYPES[s.type].n,84,266);
+  g.fillStyle=MUTED;g.font='500 26px '+BD;g.fillText(TYPES[s.type].n+'　｜　いま'+s.startAge+'歳からの未来',84,266);
   // age stamp
   g.save();g.translate(940,150);g.rotate(-0.12);g.strokeStyle=P;g.lineWidth=5;g.beginPath();g.arc(0,0,92,0,7);g.stroke();
   g.fillStyle=P;g.textAlign='center';g.font='26px '+BD;g.fillText('享年',0,-22);g.font='72px '+D;g.fillText(s.age,0,50);g.restore();
@@ -455,11 +539,13 @@ async function drawCard(){
   try{const nb=document.getElementById('nshare');if(nb&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'a.png',{type:'image/png'})]}))nb.hidden=false}catch(e){}
 }
 function render(){
-  app.innerHTML=view==='home'?vHome():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='life'?vLife():vEnd();
+  app.innerHTML=view==='home'?vHome():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():vEnd();
+  if(view==='setup')syncSetup();
   if(view==='end')drawCard();
 }
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;setTimeout(()=>t.hidden=true,1600)}
 
+app.addEventListener('input',e=>{if(e.target.id==='age')syncSetup()});
 app.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.type&&!b.dataset.act){cardType=b.dataset.type;cardFromQuiz=false;view='card';render();scrollTo(0,0);return}
@@ -468,14 +554,14 @@ app.addEventListener('click',e=>{
     render();return}
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
   const a=b.dataset.act;
-  if(a==='home'){stop();view='home';render();scrollTo(0,0)}
+  if(a==='home'){stop();if(friend){friend=null;try{history.replaceState(null,'',location.pathname)}catch(e){}}view='home';render();scrollTo(0,0)}
+  if(a==='setup'){cardType=b.dataset.type;view='setup';render();scrollTo(0,0)}
   if(a==='quiz'){qi=0;qa=[];view='quiz';render();scrollTo(0,0)}
-  if(a==='begin'){stop();pending=null;autoSkip=false;speed=1;s=newLife(b.dataset.type);push(s.type+'として、18歳の春を迎えた。','ms');
-    pending={t:'高校卒業。この先どうする？',o:[{l:'大学に進む',lean:'N',fx:x=>{x.uni=true;ms(x,'大学に進学');return '大学に進学した。'}},{l:'すぐに働く',lean:'S',fx:x=>{x.money+=20;add(x,'happy',3);return '社会に出ることを選んだ。'}}]};
-    view='life';render();scrollTo(0,0)}
-  if(a==='quick'){stop();autoSkip=true;s=newLife(b.dataset.type);push(s.type+'として、18歳の春を迎えた。','ms');
-    const t=s.t; if(t.N||R()<.5){s.uni=true;ms(s,'大学に進学')}
-    pending=null;let guard=0;while(!s.dead&&guard++<200){step()}
+  if(a==='begin'){stop();pending=null;autoSkip=false;speed=1;const p=view==='setup'?readSetup():prof;startLife(b.dataset.type,p);
+    view='life';render();scrollTo(0,0);if(!pending)play()}
+  if(a==='quick'){stop();autoSkip=true;pending=null;startLife(b.dataset.type,readSetup());
+    if(pending){const i=pending.o.findIndex(o=>s.t[o.lean]);resolve(i<0?0:i)}
+    let guard=0;while(!s.dead&&guard++<200){step()}
     view='end';render();scrollTo(0,0);return}
   if(a==='saveimg'){const im=document.getElementById('cardimg');if(!im.src)return;const l=document.createElement('a');l.href=im.src;l.download='16bun1_'+s.type+'_'+s.age+'.png';document.body.appendChild(l);l.click();l.remove();toast('画像を保存しました');return}
   if(a==='nshare'){const im=document.getElementById('cardimg');fetch(im.src).then(r=>r.blob()).then(bl=>{const f=new File([bl],'16bun1.png',{type:'image/png'});return navigator.share({files:[f],text:shareText()})}).catch(()=>{});return}
