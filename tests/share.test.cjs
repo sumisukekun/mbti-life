@@ -26,7 +26,7 @@ for(const f of ['i18n/ja.js','scene.js','result-card.js','app.js'])vm.runInConte
  c.navigator.clipboard.write=async()=>{throw Error('denied')};await vm.runInContext('copyImage84()',c);assert(status.textContent.includes('許可されません'));
  im.src='';await vm.runInContext('copyImage84()',c);assert(status.textContent.includes('お待ちください'));
  for(const lang of ['ja','en','ko','zh','es','fr','de','it','pt','id']){
- const h=fs.readFileSync(`share/${lang}/index.html`,'utf8');assert(h.includes('summary_large_image'));assert(h.includes('share-preview-v84.png'));
+ const h=fs.readFileSync(`share/${lang}/index.html`,'utf8');assert(h.includes('summary_large_image'));assert(h.includes(lang==='ja'?'share-preview-v89.jpg':'share-preview-v84.png'));
  let target;const ctx={URLSearchParams,URL,location:{search:u.search,origin:u.origin,replace(v){target=v}},document:{getElementById(){return {}}}};vm.createContext(ctx);vm.runInContext(h.match(/<script>([\s\S]*?)<\/script>/)[1],ctx);const dest=new URL(target,u.origin);assert.equal(dest.searchParams.get('r'),u.searchParams.get('r'));assert.equal(dest.searchParams.get('lang'),lang);
  }
  console.log('PASS: 10 outcome themes; factual model and name privacy; no opinion input; image copy; result roundtrip; 10 languages');
