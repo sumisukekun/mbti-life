@@ -25,3 +25,9 @@ a{color:var(--blue)}button,a,input,select{-webkit-tap-highlight-color:transparen
 
 .person91{display:block;width:68px;height:92px;flex:none;image-rendering:pixelated}.idbody>.person91{border-radius:8px;background:#1d2b4e;border:1px solid #3e5582;padding:5px}
 .modal{background:#030717db;border:0;border-radius:0;box-shadow:none}.mbox{background:#131d3a;border:1px solid #6579a8;border-radius:12px;box-shadow:0 16px 70px #0008}.quick{color:var(--blue)}.tipbox{border-radius:10px;background:#181e39}.rbody .rfields{border-color:#354b76}
+
+/* Keep every caption outside the character canvas. */
+.scene .scap{position:static;left:auto;right:auto;bottom:auto;display:flex;gap:7px;padding:12px 14px;background:var(--card);border-top:1px solid var(--line);pointer-events:auto}
+.scene .scap .chip{background:transparent;color:var(--blue);padding:0;border-radius:0;font-size:11px;line-height:1.6}
+.scene .scap .say{display:block;width:100%;max-width:none;background:transparent;color:var(--ink);border:0;border-radius:0;padding:0;box-shadow:none;font-size:13px;line-height:1.85;overflow-wrap:anywhere}
+.other92{font-size:12px;color:var(--muted)}.other92 summary{cursor:pointer;padding:10px 0}.other92 .mgrid{margin-top:10px}

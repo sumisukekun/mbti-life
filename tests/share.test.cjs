@@ -6,7 +6,7 @@ for(const f of ['i18n/ja.js','scene.js','result-card.js','app.js'])vm.runInConte
 (async()=>{
  vm.runInContext(`launch83(true);stop();autoSkip=true;while(!s.dead){if(pending)resolveAuto();step()}`,c);
  const result=vm.runInContext('resultUrl()',c),u=new URL(result);assert.match(u.pathname,/^\/share\/ja\/[0-9]\/$/);assert.deepEqual(JSON.parse(JSON.stringify(vm.runInContext(`dec(new URL(resultUrl()).searchParams.get('r'))`,c))),JSON.parse(JSON.stringify(vm.runInContext('shareData()',c))));
- const markup=vm.runInContext('vShare()',c);assert(markup.includes('結果画像をコピー'));assert(markup.includes('Xの投稿画面を開く'));assert(vm.runInContext('vEnd()',c).includes('data-act="shopen"'));
+ const markup=vm.runInContext('vShare()',c);assert(markup.includes('結果画像をコピー'));assert(!markup.includes('Ctrl'));assert(!markup.includes('xsteps'));const end92=vm.runInContext('vEnd()',c);assert.equal((end92.match(/Xに投稿する<\/a>/g)||[]).length,1);const intent92=new URL(vm.runInContext('xUrl()',c));assert.equal(intent92.origin,'https://x.com');assert.equal(intent92.searchParams.get('text'),vm.runInContext('shareBody()',c));assert.equal(intent92.searchParams.get('url'),result);assert(vm.runInContext('vEnd()',c).includes('data-act="shopen"'));
  assert(!markup.includes('id="shword"'),'No personal opinion input');
  const scenarios=[{founder:true,startup:true,money:5000},{kids:2,grand:1,love:75},{age:98},{trips:5},{career:90},{love:90},{money:8000},{happy:80},{founder:true,startup:false},{}];
  const original=vm.runInContext('JSON.stringify(s)',c);

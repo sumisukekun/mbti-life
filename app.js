@@ -260,7 +260,7 @@ function resolve(i){
 }
 function chParams(){return {name:s.pname||'',country:'@country.'+s.country}}
 function focusDecision90(){document.getElementById('decision90')?.scrollIntoView?.({behavior:'smooth',block:'start'})}
-function play(){stop();if(!s||s.dead)return;if(pending){render();focusDecision90();return}manual86=false;branchTimeline86();timer=setInterval(()=>{step();if(pending||s.dead)untilChoice=false;render()},untilChoice?60:Math.round(2400/speed))}
+function play(){stop();if(!s||s.dead)return;if(pending){render();focusDecision90();return}manual86=false;branchTimeline86();timer=setInterval(()=>{step();if(pending||s.dead)untilChoice=false;render()},untilChoice?60:Math.round(2400/speed));render()}
 function stop(){clearInterval(timer);timer=null}
 
 /* ---------- 初期設定 ---------- */
@@ -739,7 +739,7 @@ function vEnd(){
   for(let a=s.startAge+1;a<=s.age;a++){const h=s.hist[a-s.startAge-1];cells+=`<i class="on${msAges.has(a)?' ms':''}" style="--h:${h}" title="${esc(tr('u.age',{n:a}))}"></i>`}
   const bs=bestScene();sceneOverride={key:bs.key,age:bs.age,happy:95};
   return `${topNav()}
-  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xにこの人生をシェア':'Share this life on X'}</a><button class="btn ghost" data-act="shopen">${lang==='ja'?'詳しい結果画像を保存・共有':'Save or share full result image'}</button></div><p class="note">${lang==='ja'?'Xのリンク画像は称号に合うキャラクター、保存画像は今回の年齢・評価まで入ったカードです。':'The link preview shows your life theme. The full image includes your exact age and ratings.'}</p></section>
+  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xに投稿する':'Post to X'}</a><button class="btn ghost" data-act="shopen">${lang==='ja'?'結果画像を保存':'Save result image'}</button></div><p class="note">${lang==='ja'?'文章と結果カード付きリンクは自動で入ります。最後にXで「ポスト」を押すだけ。':'Your text and result-card link are filled in. Review and press Post on X.'}</p></section>
   <article class="record">
     <header class="rhead"><span>${esc(tr('rec.head'))}</span><span>No. ${no}</span></header>
     <div class="rbody">
@@ -769,13 +769,9 @@ function vEnd(){
     <figcaption><span class="eyebrow">${esc(tr('rec.f.best'))}</span><b>${esc(tr('u.age',{n:bestAge()}))} · ${yearOf(bestAge())}</b><span>${esc(tr(bs.label))}</span></figcaption>
     <div class="fscene"><canvas id="fscene" width="${SW}" height="${SH}" role="img" aria-label="${esc(tr(bs.label))}"></canvas></div>
   </figure>
-  <div class="ractions xrow">
-    <button class="btn xbtn" data-act="shopen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(lang==='ja'?'Xに画像付きで投稿':'Share an image on X')}</button>
-  </div>
   <section class="sec"><h3>${esc(tr('rec.highlights'))}</h3><ul class="mslist">${hl.map(m=>`<li><span>${esc(tr('u.age',{n:m[0]}))}</span>${esc(tr(m[1],m[2]))}</li>`).join('')||`<li><span>—</span>${esc(tr('rec.quiet'))}</li>`}</ul></section>
   <div class="ractions">
     <button class="btn ghost" data-act="replay">${esc(tr('rec.replay'))}</button>
-    <button class="btn pinkbtn" data-act="shopen">${esc(tr('rec.share'))}</button>
     <button class="btn" data-act="again">${esc(tr('rec.again'))}</button>
   </div>
   <button class="quick" data-act="home">${esc(tr('rec.other'))}</button>
@@ -785,29 +781,19 @@ function vEnd(){
   ${shareOpen?vShare():''}`;
 }
 function vShare(){
-  return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="mbox">
-    <div class="mhead"><h3 id="shT">${esc(tr('sh.title'))}</h3><button class="mx" data-act="shclose" aria-label="${esc(tr('sh.close'))}">×</button></div>
-    <p class="mlead">${lang==='ja'?'文章も画像も、今回の人生から自動で作成しました。':'Your text and image were automatically created from your life.'}</p>
-    <section class="xsteps" aria-label="${lang==='ja'?'Xへの画像投稿手順':'Image sharing steps'}">
-      <h4>${lang==='ja'?'Xに結果画像を付けて投稿':'Post your result image on X'}</h4>
-      <ol><li>${lang==='ja'?'下の「結果画像をコピー」を押す。使えない場合は「画像を保存」。':'Copy your result image below, or save it if copying is unavailable.'}</li>
-      <li>${lang==='ja'?'「Xの投稿画面を開く」を押す。文章とリンクが入ります。':'Open the X composer. Your text and link will be filled in.'}</li>
-      <li>${lang==='ja'?'投稿欄をクリックし Ctrl＋V（Macは⌘＋V）。保存した場合は写真ボタンで添付し、画像を確認して投稿。':'Paste into the composer (Ctrl+V / ⌘+V), or attach the saved file with the photo button. Check the image before posting.'}</li></ol>
-      <p class="note">${lang==='ja'?'リンクのプレビューとは別に、今回の年齢・称号・評価が入った画像を添付できます。':'Attach your exact age, life title and ratings as an image, separately from the link preview.'}</p>
-      <button class="btn pinkbtn wide" data-act="copyimg" id="copyimg" disabled>${lang==='ja'?'結果画像をコピー':'Copy result image'}</button>
-      <p id="imgstatus" role="status" aria-live="polite">${lang==='ja'?'画像を準備しています…':'Preparing your image…'}</p>
-    </section>
-    <button class="btn pinkbtn wide" data-act="nshare" id="nshare" hidden>${esc(tr('sh.img'))}</button>
-    <div class="mgrid">
-      <a class="sbtn" id="shx" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(lang==='ja'?'Xの投稿画面を開く':'Open X composer')}</a>
-      <a class="sbtn" id="shth" href="${threadsUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.2 22c-3 0-5.3-1-6.8-2.9C4 17.4 3.3 15 3.3 12s.7-5.4 2.1-7.1C6.9 3 9.2 2 12.2 2c2.3 0 4.2.6 5.6 1.7 1.3 1 2.2 2.5 2.7 4.3l-2 .5c-.8-3-3-4.5-6.3-4.5-2.4 0-4.2.7-5.3 2.2-1 1.3-1.6 3.3-1.6 5.8s.5 4.5 1.6 5.8c1.1 1.5 2.9 2.2 5.3 2.2 2.1 0 3.6-.5 4.8-1.6 1.3-1.2 1.3-2.7.9-3.6-.2-.5-.6-1-1.1-1.3-.1 1-.4 1.8-.9 2.5-.8 1-1.9 1.6-3.3 1.7-1.1.1-2.1-.2-2.9-.7-.9-.6-1.4-1.5-1.5-2.5-.1-2 1.5-3.4 4-3.6.9-.1 1.7 0 2.5.1-.1-.6-.3-1-.6-1.3-.4-.5-1.1-.7-2-.7-1.2 0-2 .4-2.6 1.2l-1.6-1.1c.9-1.3 2.3-2 4.2-2 1.5 0 2.6.5 3.4 1.4.7.8 1 1.9 1.1 3.3.6.3 1.1.6 1.5 1.1.7.8 1.1 1.9 1.1 3.1 0 1.5-.6 3-1.9 4.1-1.5 1.4-3.5 2.1-6.1 2.2Zm.5-9.2h-.5c-1.6.1-2.4.8-2.4 1.6.1.9 1 1.3 2 1.2 1.6-.1 2.3-1.1 2.5-2.6-.5-.1-1-.2-1.6-.2Z"/></svg>${esc(tr('sh.threads'))}</a>
-      <button class="sbtn" data-act="copy">${esc(tr('sh.copy'))}</button>
-      <button class="sbtn" data-act="saveimg">${esc(tr('sh.save'))}</button>
-    </div>
-    <figure class="mprev"><figcaption>${esc(tr('sh.preview'))}</figcaption><img class="imgcard" id="cardimg" alt="${esc(s.type+' · '+title())}"></figure>
-    <p class="note">${lang==='ja'?'画像には性格タイプ・国・享年・称号・結果の要約・評価が入ります。入力した個人名は載せません。':'The image includes your type, country, lifespan, title, summary and ratings. Personal names are omitted.'}</p>
-    ${tipUrl()?`<a class="mtip" href="${esc(tipUrl())}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a>`:''}
-  </div></div>`;
+ return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="mbox">
+  <div class="mhead"><h3 id="shT">${lang==='ja'?'結果画像を保存':'Save your result image'}</h3><button class="mx" data-act="shclose" aria-label="${esc(tr('sh.close'))}">×</button></div>
+  <p class="mlead">${lang==='ja'?'今回の人生の画像です。Xへの投稿は、結果画面の「Xに投稿する」からそのまま進めます。':'Here is your life card. Use Post to X on the result screen to share directly.'}</p>
+  <figure class="mprev"><img class="imgcard" id="cardimg" alt="${esc(s.type+' · '+title())}"></figure>
+  <button class="btn pinkbtn wide" data-act="saveimg">${esc(tr('sh.save'))}</button>
+  <button class="btn ghost wide" data-act="nshare" id="nshare" hidden>${esc(tr('sh.img'))}</button>
+  <details class="other92"><summary>${lang==='ja'?'コピー・その他の共有':'Copy and other sharing options'}</summary><div class="mgrid">
+   <button class="sbtn" data-act="copyimg" id="copyimg" disabled>${lang==='ja'?'結果画像をコピー':'Copy result image'}</button>
+   <button class="sbtn" data-act="copy">${esc(tr('sh.copy'))}</button>
+   <a class="sbtn" id="shth" href="${threadsUrl()}" target="_blank" rel="noopener">${esc(tr('sh.threads'))}</a>
+  </div><p id="imgstatus" role="status" aria-live="polite">${lang==='ja'?'画像を準備しています…':'Preparing your image…'}</p></details>
+  <p class="note">${lang==='ja'?'画像には性格タイプ・国・享年・称号・要約・評価が入ります。入力した個人名は載せません。':'Your type, country, age, title, summary and ratings are included. Personal names are omitted.'}</p>
+ </div></div>`;
 }
 function updShareLinks(){const x=document.getElementById('shx'),t=document.getElementById('shth');if(x)x.href=xUrl();if(t)t.href=threadsUrl()}
 const FONTS={fr:['"Dela Gothic One"','"Zen Kaku Gothic New"'],de:['"Dela Gothic One"','"Zen Kaku Gothic New"'],it:['"Dela Gothic One"','"Zen Kaku Gothic New"'],pt:['"Dela Gothic One"','"Zen Kaku Gothic New"'],id:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ja:['"Dela Gothic One"','"Zen Kaku Gothic New"'],en:['"Dela Gothic One"','"Zen Kaku Gothic New"'],es:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ko:['"Black Han Sans"','"Noto Sans KR"'],zh:['"Noto Sans TC"','"Noto Sans TC"']};
