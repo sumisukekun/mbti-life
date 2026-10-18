@@ -39,3 +39,11 @@ Settings → Pages → Source: `Deploy from a branch` → Branch: `main` / `/ (r
 - 既存共有URLも維持しています。
 
 静的リンク画像と100言語別ページの再生成：`LIFE_CARD_FONT=/path/to/Japanese-font.ttf node tools/gen_result_cards.cjs`。開発時のみ`@napi-rs/canvas`が必要です。日本語フォント例はGoogle FontsのZen Kaku Gothic New。サイト実行時はブラウザのCanvasのみを使います。
+
+## v86：時間の巻き戻しと速度調整
+- 上部に年齢スライダー、「1年戻る」「1年進む」「進んでいた年へ」を追加。すでに通った年を前後に移動できます。
+- 過去に戻すと1倍速・一時停止。大きな選択のあった年は選択前へ戻り、選び直せます。
+- 過去から再生・選択したときは、それより先の履歴を新しい進行で置き換えます。スライダーで振り返るだけなら先の履歴は残ります。
+- 年ごとに状態・保留中の選択・乱数状態をメモリ内保存。別の人生を開始すると巻き戻し履歴はリセットされます。
+- 0.5倍速追加。1倍は1年2.4秒、2倍は1年1.2秒。速度変更だけでは停止中の再生を始めません。
+- テスト：`node tests/timeline.test.cjs`、`node tests/share.test.cjs`。

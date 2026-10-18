@@ -66,6 +66,7 @@ const eduName=e=>tr('edu.'+(EDU[e]?e:'hs'));
 function jobKey(g,early){return early?`jobE.${g}.${Math.floor(R()*2)}`:`job.${g}.${Math.floor(R()*5)}`}
 function newName(){const L=NAMES[s.country]||NAMES.us;const used=[s.pname,...(s.kidNames||[])];const f=L.filter(n=>!used.includes(n));return pick(f.length?f:L)}
 
+let timeline86=[],cursor86=-1,manual86=false;
 let s=null, view='home', qi=0, qa=[], timer=null, speed=1, pending=null, autoSkip=false, untilChoice=false;
 let cardType=null,cardFromQuiz=false,shareOpen=false;
 
@@ -223,7 +224,7 @@ function deathCheck(){
   return R()<p||s.age>=108;
 }
 function resolveAuto(){const i=pending.o.findIndex(o=>s.t[o.lean]);resolve(i<0?0:i)}
-function step(){
+function stepBase86(){
   if(pending||s.dead)return;
   s.age++;
   yearly();
@@ -249,14 +250,15 @@ function step(){
     setTimeout(()=>{if(view==='life'&&s===me)startFinale()},speed>1?600:1400)}
 }
 function resolve(i){
+  saveSnapshot86();branchTimeline86();
   const e=pending;pending=null;untilChoice=false;s.decisions++;
   const r=e.o[i].fx(s);const rr=typeof r==='string'?RK(r):r;
   push('log.choice',{h:'@ch.'+e.id+'.h',o:RK('ch.'+e.id+'.o.'+e.o[i].id,chParams()),r:rr},'ch');
   if(view==='life')render();
-  if(!autoSkip&&!s.dead)play();
+  if(!autoSkip&&!s.dead&&!manual86)play();
 }
 function chParams(){return {name:s.pname||'',country:'@country.'+s.country}}
-function play(){stop();timer=setInterval(()=>{step();if(pending||s.dead)untilChoice=false;render()},untilChoice?60:Math.round(1100/speed))}
+function play(){stop();manual86=false;branchTimeline86();timer=setInterval(()=>{step();if(pending||s.dead)untilChoice=false;render()},untilChoice?60:Math.round(2400/speed))}
 function stop(){clearInterval(timer);timer=null}
 
 /* ---------- 初期設定 ---------- */
@@ -268,7 +270,7 @@ const JOBCAT=['office','it','med','gov','edu','creator','service','maker','pro',
 const JOBGRP={office:'sj',it:'nt',med:'nf',gov:'sj',edu:'nf',creator:'nf',service:'sp',maker:'sp',pro:'nt',free:'sp',owner:'nt',part:'sp'};
 const INC=[[0,200,160],[200,400,300],[400,600,500],[600,800,700],[800,1000,900],[1000,1500,1200],[1500,null,1800]];
 const SAV=[[0,50,20],[50,300,150],[300,1000,600],[1000,3000,1800],[3000,null,4500]];
-function startLife(type,p){
+function startLifeBase86(type,p){
   COUNTRY=COUNTRY||'jp';s=newLife(type);s.age=p.age;s.startAge=p.age;
   push('log.start',{age:p.age,country:'@country.'+s.country,type},'ms');
   s.startPlace=p.status==='student'?'school':p.status==='work'?(p.job==='owner'?'tower':'office'):(p.sit==='retired'||p.age>=65)?'park':'home';
@@ -527,7 +529,7 @@ function vLife(){
   for(let a=s.startAge;a<=end;a++){const i=a-s.startAge-1;const h=a===s.startAge?null:s.hist[i];
     const lived=a<=s.age;const st=lived&&h!=null?`style="--h:${h}"`:'';
     cells+=`<i class="${lived?'on':''}${msAges.has(a)?' ms':''}${a===s.age?' now':''}" ${st} title="${esc(tr('u.age',{n:a}))}${lived&&h!=null?' · '+esc(tr('p.happyTip',{n:h})):''}"></i>`}
-  const spd=[1,2,4,8].map(v=>`<button class="sp${speed===v&&!untilChoice?' on':''}" data-speed="${v}">${v}×</button>`).join('');
+  const spd=[0.5,1,2,4,8].map(v=>`<button class="sp${speed===v&&!untilChoice?' on':''}" data-speed="${v}">${v}×</button>`).join('');
   return `<header class="topbar">
     <div class="tleft"><span class="brand">${tr('brand.short')}</span><span class="tage">${esc(tr('u.age',{n:s.age}))}</span><span class="tmeta">${flag(s.country)} ${esc(CN(s.country))} · ${yearOf(s.age)} · ${s.type} · ${esc(phase())}</span></div>
     <div class="tctrl">${s.dead?`<button class="btn small" data-act="toend">${esc(tr('life.toEnd'))}</button>`:`
@@ -535,7 +537,14 @@ function vLife(){
       <button class="sp${untilChoice?' on':''}" data-act="next">${esc(tr('life.next'))}</button>
       <button class="sp${autoSkip?' on':''}" data-act="autotoggle">${esc(tr(autoSkip?'life.autoOn':'life.auto'))}</button>
       <button class="sp" data-act="skip">${esc(tr('life.skip'))}</button>`}</div>
-    <div class="tprog"><i style="width:${Math.min(100,(s.age-s.startAge)/(Math.max(100,s.age)-s.startAge)*100)}%"></i></div></header>
+    <div class="time86"><div class="time86row">
+      <button class="sp" data-act="back86" ${s.age<=s.startAge?'disabled':''}>${lang==='ja'?'◀ 1年戻る':'◀ Back 1 year'}</button>
+      <label for="timeline86">${lang==='ja'?'時間を戻す・振り返る':'Rewind / review'}</label>
+      <output id="tseekout86" for="timeline86">${esc(tr('u.age',{n:s.age}))}</output>
+      <button class="sp" data-act="forward86">${lang==='ja'?'1年進む ▶':'Forward 1 year ▶'}</button>
+      ${s.age<(timeline86.at(-1)?.state.age||s.age)?`<button class="sp" data-act="latest86">${lang==='ja'?'進んでいた年へ':'Latest year'}</button>`:''}
+    </div><input id="timeline86" type="range" min="${s.startAge}" max="${Math.max(s.startAge+1,timeline86.at(-1)?.state.age||s.age)}" value="${s.age}" ${timeline86.length<2?'disabled':''} aria-label="${lang==='ja'?'人生の時間を戻すスライダー':'Life timeline rewind slider'}">
+    <p class="time86note">${lang==='ja'?'つまみを左へ動かすと過去へ戻って停止。選択があった年は選ぶ前に戻ります。再生・選択でやり直せます。速いときは0.5×か1×へ。':'Drag left to rewind and pause. Play or choose to make a new path. Use 0.5× or 1× to slow down.'}</p></div></header>
   <div class="lifegrid">
     <div class="col">
       <section class="panel idcard o2"><div class="idhead"><span>${esc(tr('p.id'))} · ${s.type}</span><span>${COUNTRIES[s.country].code}</span></div>
@@ -828,8 +837,9 @@ document.addEventListener('keydown',e=>{
   if(view==='finale'&&(e.key===' '||e.key==='Enter'||e.key==='ArrowRight')){e.preventDefault();finNext()}
   if(view==='end'&&shareOpen&&e.key==='Escape'){shareOpen=false;render()}
 });
-app.addEventListener('input',e=>{if(e.target.id==='age')syncSetup();if(e.target.id==='shword')updShareLinks()});
+app.addEventListener('input',e=>{if(e.target.id==='timeline86'){stop();manual86=true;const out=document.getElementById('tseekout86');if(out)out.textContent=tr('u.age',{n:+e.target.value});return}if(e.target.id==='age')syncSetup();if(e.target.id==='shword')updShareLinks()});
 app.addEventListener('change',e=>{
+  if(e.target.id==='timeline86'){seekAge86(+e.target.value);return}
   if(e.target.name==='status')syncSetup();
   if(e.target.id==='langsel'){if(view==='setup')readSetup();lang=e.target.value;applyLang();render()}
 });
@@ -841,8 +851,11 @@ app.addEventListener('click',e=>{
     if(qi>=QUIZ.length){const c=k=>qa.filter(x=>x===k).length;cardType=(c('E')>=2?'E':'I')+(c('S')>=2?'S':'N')+(c('T')>=2?'T':'F')+(c('J')>=2?'J':'P');cardFromQuiz=true;view='card'}
     render();return}
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
-  if(b.dataset.speed){speed=+b.dataset.speed;untilChoice=false;if(!pending&&!s.dead)play();render();return}
+  if(b.dataset.speed){const running=!!timer;speed=+b.dataset.speed;untilChoice=false;if(running&&!pending&&!s.dead)play();render();return}
   const a=b.dataset.act;
+  if(a==='back86'){seekAge86(s.age-1);return}
+  if(a==='forward86'){forwardYear86();return}
+  if(a==='latest86'){seekAge86(timeline86.at(-1)?.state.age||s.age);return}
   if(a==='random83'||a==='daily83'){launch83(a==='daily83');return}
   if(a==='home'){if(friend){friend=null;try{history.replaceState(null,'',location.pathname)}catch(e){}}clearTimeout(fin.t);go('home')}
   if(a==='setup'){cardType=b.dataset.type;go('setup')}
@@ -869,6 +882,31 @@ app.addEventListener('click',e=>{
     const fallback=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(tr('t.copied'))}catch(err){toast(tr('t.select'))}ta.remove()};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast(tr('t.copied')),fallback);else fallback()}
 });
+
+/* Annual state checkpoints preserve decisions and RNG for accurate rewind. */
+function saveSnapshot86(){
+ if(!s)return;
+ const existing=timeline86.findIndex(x=>x.state.age===s.age);
+ if(existing>=0){if(s.dead)timeline86[existing]={state:JSON.parse(JSON.stringify(s)),pending,rng:rng83};return}
+ timeline86.push({state:JSON.parse(JSON.stringify(s)),pending,rng:rng83});cursor86=timeline86.length-1;
+}
+function branchTimeline86(){if(cursor86>=0&&cursor86<timeline86.length-1)timeline86=timeline86.slice(0,cursor86+1)}
+function startLife(type,p){manual86=false;timeline86=[];cursor86=-1;if(rng83===null)rng83=Math.floor(Math.random()*4294967296);startLifeBase86(type,p);saveSnapshot86()}
+function step(){if(!s||pending||s.dead)return;branchTimeline86();stepBase86();saveSnapshot86()}
+function seekAge86(age){
+ if(!timeline86.length)return;stop();clearTimeout(fin.t);
+ const n=Math.max(s.startAge,Math.min(timeline86.at(-1).state.age,Math.round(age)));
+ const i=timeline86.findIndex(x=>x.state.age===n);if(i<0)return;
+ const cp=timeline86[i];s=JSON.parse(JSON.stringify(cp.state));pending=cp.pending;rng83=cp.rng;cursor86=i;
+ COUNTRY=s.country;autoSkip=false;untilChoice=false;manual86=true;speed=1;view='life';shareOpen=false;cardCache85=null;render();
+}
+function forwardYear86(){
+ stop();manual86=true;untilChoice=false;
+ const next=timeline86.find(x=>x.state.age===s.age+1);
+ if(next){seekAge86(next.state.age);return}
+ if(pending){toast(lang==='ja'?'先に、この年の選択肢を選んでください。':'Choose an option for this year first.');render();return}
+ autoSkip=false;step();stop();manual86=true;render();
+}
 
 function imageStatus84(message){const el=document.getElementById('imgstatus');if(el)el.textContent=message}
 async function copyImage84(){
