@@ -1,4 +1,4 @@
-# 16分の1の人生 — World Edition
+# 83億分の1の人生 — World Edition
 
 MBTIタイプと生きる国を選んで、ひとりの人生を最期まで早送りするブラウザゲーム。
 16か国 × 10言語（日本語・English・한국어・繁體中文・Español・Français・Deutsch・Italiano・Português・Bahasa Indonesia）。
@@ -20,3 +20,6 @@ Settings → Pages → Source: `Deploy from a branch` → Branch: `main` / `/ (r
 
 ※ 診断と人生のできごとはエンタメ用のフィクションです。
 © BusinessMaker
+
+## v83
+ランダム即時開始、日本時間の日替わり共通チャレンジ、端末内の24件人生履歴、共有URL修正を追加。83億は世界観を表すタイトルであり人口比や組み合わせ数の保証ではありません。

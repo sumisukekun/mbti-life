@@ -320,3 +320,6 @@ body.dark-stage{background:#0E1018}
 .bestimg .fscene{border-color:var(--pink);box-shadow:0 0 0 4px rgba(242,54,127,.15)}
 .xbtn{display:inline-flex;align-items:center;gap:8px;background:#000;color:#fff;border-color:#000;text-decoration:none}
 .xbtn svg{width:18px;height:18px;fill:currentColor}
+
+/* v83 */
+.explore83{border:2px solid var(--line);border-radius:24px;padding:clamp(18px,4vw,32px);margin:24px 0;background:var(--card)}.explore83 .row{flex-wrap:wrap;gap:12px}.explore83 .btn{white-space:normal}.hero2 h1{overflow-wrap:anywhere}@media(max-width:600px){.explore83 .btn{width:100%}.brand{font-size:18px}}

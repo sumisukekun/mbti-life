@@ -1,4 +1,4 @@
-/* 16分の1の人生 — World Edition */
+/* 83億分の1の人生 — World Edition */
 'use strict';
 const LANGS=['ja','en','ko','zh','es','fr','de','it','pt','id'];
 const HTML_LANG={ja:'ja',en:'en',ko:'ko',zh:'zh-Hant-TW',es:'es',fr:'fr',de:'de',it:'it',pt:'pt-BR',id:'id'};
@@ -57,7 +57,9 @@ function rangeLabel(lo,hi){return lo===0?tr('range.under',{b:fmtMoney(hi)}):hi==
 const ORDER=['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'];
 const grp=t=>t[1]==='N'?(t[2]==='T'?'nt':'nf'):(t[3]==='J'?'sj':'sp');
 const QUIZ=[['E','I'],['S','N'],['T','F'],['J','P'],['E','I'],['S','N'],['T','F'],['J','P'],['E','I'],['S','N'],['T','F'],['J','P']];
-const R=Math.random, pick=a=>a[Math.floor(R()*a.length)];
+let rng83=null;
+function R(){if(rng83===null)return Math.random();rng83=(rng83+0x6D2B79F5)|0;let t=rng83;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296}
+const pick=a=>a[Math.floor(R()*a.length)];
 const clamp=v=>Math.max(0,Math.min(100,v));
 const EDU={jh:[200,.75],hs:[260,.85],vo:[280,.95],jc:[280,.95],univ:[320,1.05],grad:[380,1.15]};
 const eduName=e=>tr('edu.'+(EDU[e]?e:'hs'));
@@ -411,6 +413,7 @@ function vHome(){
       <p class="hstat">${esc(tr('hero.stat'))}</p></div>
     <figure class="globe"><canvas id="globe" width="520" height="520" aria-hidden="true"></canvas><figcaption>${esc(tr('home.globe'))}</figcaption></figure>
   </header>
+  ${vExplore83()}
   <section class="sec"><div class="sech"><span class="stepn">01</span><h2>${esc(tr('home.country'))}</h2></div><p class="note">${esc(tr('home.countryNote'))}</p>
     ${REGIONS.map(([r,list])=>`<div class="region"><span class="rlabel">${esc(tr('home.region.'+r))}</span><div class="cgrid">${list.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></div>`).join('')}</section>
   <section class="sec"><div class="sech"><span class="stepn">02</span><h2>${esc(tr('home.type'))}</h2></div>
@@ -611,7 +614,7 @@ const SHARE_URL='https://mbti.businessmaker.net/';
 function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
 function shareData(){return {t:s.type,a:s.age,ti:titleIdx(),r:ratings(),kw:keywords(),c:curve(24),l:lang,cc:s.country}}
-function resultUrl(){return SHARE_URL+'r/'+(lang==='ja'?'':lang+'/')+s.type+'-'+titleIdx()+'/?r='+enc(shareData())}
+function resultUrl(){return SHARE_URL+'?lang='+encodeURIComponent(lang)+'&r='+encodeURIComponent(enc(shareData()))}
 function shareBody(){return tr('share.text',{type:s.type,title:title(),age:s.age,country:CN(s.country),kw:keywords().map(k=>tr(k)).join(tr('kw.sep'))})}
 function shareWord(){const w=document.getElementById('shword');return w&&w.value.trim()?w.value.trim().slice(0,140)+'\n\n':''}
 function shareText(){return shareWord()+shareBody()+'\n'+resultUrl()}
@@ -654,7 +657,7 @@ function buildFinale(){
   sl.push({t:'sum'});
   fin={slides:sl,i:0,t:0};
 }
-function startFinale(){stop();buildFinale();view='finale';shareOpen=false;render();scheduleFin()}
+function startFinale(){save83();stop();buildFinale();view='finale';shareOpen=false;render();scheduleFin()}
 function scheduleFin(){clearTimeout(fin.t);const sl=fin.slides[fin.i];if(!sl||sl.t==='sum')return;fin.t=setTimeout(()=>{finNext()},sl.dur||3000)}
 function finNext(){if(view!=='finale')return;if(fin.i<fin.slides.length-1){fin.i++;render();scheduleFin()}}
 function vFinale(){
@@ -836,12 +839,13 @@ app.addEventListener('click',e=>{
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
   if(b.dataset.speed){speed=+b.dataset.speed;untilChoice=false;if(!pending&&!s.dead)play();render();return}
   const a=b.dataset.act;
+  if(a==='random83'||a==='daily83'){launch83(a==='daily83');return}
   if(a==='home'){if(friend){friend=null;try{history.replaceState(null,'',location.pathname)}catch(e){}}clearTimeout(fin.t);go('home')}
   if(a==='setup'){cardType=b.dataset.type;go('setup')}
   if(a==='quiz'){qi=0;qa=[];go('quiz')}
-  if(a==='begin'){stop();pending=null;autoSkip=false;speed=1;const p=view==='setup'?readSetup():prof;startLife(b.dataset.type,p);
+  if(a==='begin'){rng83=null;stop();pending=null;autoSkip=false;speed=1;const p=view==='setup'?readSetup():prof;startLife(b.dataset.type,p);
     view='life';render();scrollTo(0,0);if(!pending)play()}
-  if(a==='quick'){pending=null;startLife(b.dataset.type,readSetup());quickRun();return}
+  if(a==='quick'){rng83=null;pending=null;startLife(b.dataset.type,readSetup());quickRun();return}
   if(a==='toggle'){timer?stop():play();render()}
   if(a==='next'){if(pending)return;untilChoice=true;play();render()}
   if(a==='autotoggle'){autoSkip=!autoSkip;if(autoSkip&&pending)resolveAuto();render()}
@@ -851,14 +855,21 @@ app.addEventListener('click',e=>{
   if(a==='finnext'){if(e.target.closest('.fskip,.finbtn'))return;finNext()}
   if(a==='record'){e.stopPropagation();clearTimeout(fin.t);shareOpen=false;go('end')}
   if(a==='replay'){startFinale();scrollTo(0,0)}
-  if(a==='again'){const t=s.type;stop();pending=null;autoSkip=false;speed=1;COUNTRY=s.country;startLife(t,prof);view='life';render();scrollTo(0,0);if(!pending)play()}
+  if(a==='again'){rng83=null;const t=s.type;stop();pending=null;autoSkip=false;speed=1;COUNTRY=s.country;startLife(t,prof);view='life';render();scrollTo(0,0);if(!pending)play()}
   if(a==='shopen'){shareOpen=true;render()}
   if(a==='shclose'){shareOpen=false;render()}
-  if(a==='saveimg'){const im=document.getElementById('cardimg');if(!im||!im.src)return;const l=document.createElement('a');l.href=im.src;l.download='onelife16_'+s.type+'_'+s.age+'.png';document.body.appendChild(l);l.click();l.remove();toast(tr('t.saved'))}
-  if(a==='nshare'){const im=document.getElementById('cardimg');fetch(im.src).then(r=>r.blob()).then(bl=>{const f=new File([bl],'onelife16.png',{type:'image/png'});return navigator.share({files:[f],text:shareText()})}).catch(()=>{})}
+  if(a==='saveimg'){const im=document.getElementById('cardimg');if(!im||!im.src)return;const l=document.createElement('a');l.href=im.src;l.download='onelife83_'+s.type+'_'+s.age+'.png';document.body.appendChild(l);l.click();l.remove();toast(tr('t.saved'))}
+  if(a==='nshare'){const im=document.getElementById('cardimg');fetch(im.src).then(r=>r.blob()).then(bl=>{const f=new File([bl],'onelife83.png',{type:'image/png'});return navigator.share({files:[f],text:shareText()})}).catch(()=>{})}
   if(a==='copy'){const t=shareText();
     const fallback=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(tr('t.copied'))}catch(err){toast(tr('t.select'))}ta.remove()};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast(tr('t.copied')),fallback);else fallback()}
 });
+
+function day83(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).format(new Date())}
+function hash83(v){let h=2166136261;for(const c of v)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+function history83(){try{const h=JSON.parse(ls('life83.history')||'[]');return Array.isArray(h)?h.slice(0,24):[]}catch(e){return []}}
+function save83(){if(!s||!s.dead)return;const h=history83();const id=s.seed+'-'+s.age+'-'+s.type;if(h.some(x=>x.id===id))return;h.unshift({id,type:s.type,country:s.country,age:s.age,title:title(),day:day83()});ls('life83.history',JSON.stringify(h.slice(0,24)))}
+function vExplore83(){const ja=lang==='ja',h=history83();return `<section class="sec explore83"><span class="eyebrow">ONE WORLD · YOUR CHOICES</span><h2>${ja?'もし、別の人生を生きられたら。':'What if you lived another life?'}</h2><p>${ja?'設定なしですぐに始める。性格と国をランダムに選び、18歳から人生の選択を体験します。':'Start instantly with a random personality and country, from age 18.'}</p><div class="row"><button class="btn pinkbtn" data-act="random83">${ja?'運命にまかせて始める':'Start a random life'}</button><button class="btn" data-act="daily83">${ja?'今日の共通チャレンジ':'Daily challenge'}</button></div><p class="note">${ja?'毎日0時（日本時間）に更新。同じ初期条件から、選択で変わる人生を友達と比べよう。':'Resets at midnight Japan time. Same starting conditions, different choices.'}</p><p class="note">${ja?'「83億」は世界の一人ひとりをイメージしたタイトルです。現在は16か国・16タイプを舞台にしたフィクションで、人口比率の再現や83億通りの保証ではありません。':'83億 (8.3 billion) symbolizes individual lives around the world. Fiction featuring 16 countries and 16 personality types; not population-weighted or a guarantee of 8.3 billion outcomes.'}</p>${h.length?`<h3>${ja?'この端末の人生コレクション':'Lives on this device'} · ${h.length}/24</h3><ul class="mslist">${h.slice(0,6).map(x=>`<li><span>${esc(x.type)}</span>${esc(x.title)} · ${esc(CN(x.country))} · ${esc(x.age)} ${ja?'歳':'years'}</li>`).join('')}</ul><p class="note">${ja?'履歴はこのブラウザだけに保存されます。':'History is stored only in this browser.'}</p>`:''}</section>`}
+function launch83(daily){stop();clearTimeout(fin.t);pending=null;autoSkip=false;speed=1;untilChoice=false;rng83=daily?hash83('life83-v1-'+day83()):null;COUNTRY=pick(CORDER);const t=pick(ORDER);prof={...DEF,age:18,status:'student',school:'hs'};startLife(t,prof);s.challenge83=daily?day83():null;view='life';render();scrollTo(0,0);if(!pending)play()}
 applyLang();
 render();
