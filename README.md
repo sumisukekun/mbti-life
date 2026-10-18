@@ -9,7 +9,11 @@ MBTIタイプと生きる国を選んで、ひとりの人生を最期まで早�
 - `tools/gen_og.py` … 言語別のOGP画像（`og/`）とシェア用ページ（`r/`）を生成
 
 ## 広告・投げ銭
-`app.js` の先頭近くにある `TIP_URLS`（投げ銭URL）と `ADSENSE`（ca-pub と広告ユニットID）を入れると表示されます。AdSense 利用時はリポジトリ直下に `ads.txt` を置きます。
+`app.js` の `TIP_URLS`（投げ銭URL）と `ADSENSE`（ca-pub と広告ユニットID）で設定します。
+- 投げ銭：日本語 = OFUSE（https://ofuse.me/5598eedc）、その他の言語 = Ko-fi（https://ko-fi.com/businessmaker）
+- 広告：AdSense ユニット `mbti-life-display`（4533542225）。ホーム・結果・シェア閲覧画面のみ表示、未配信時は枠ごと非表示
+- ads.txt：このリポジトリ直下と businessmaker.net 直下の両方に設置
+- EU/英国向け同意メッセージ：AdSense「プライバシーとメッセージ」で公開済み（英・独・仏・西・伊・葡）
 
 ## 公開方法（GitHub Pages）
 Settings → Pages → Source: `Deploy from a branch` → Branch: `main` / `/ (root)`
