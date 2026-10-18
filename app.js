@@ -624,7 +624,7 @@ function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).rep
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
 function shareData(){return {t:s.type,a:s.age,ti:titleIdx(),r:ratings(),kw:keywords(),c:curve(24),l:lang,cc:s.country}}
 function resultUrl(){return SHARE_URL+'share/'+lang+'/'+titleIdx()+'/?r='+encodeURIComponent(enc(shareData()))}
-function shareBody(){const d=resultModel85();return d.headline.join('')+'\n'+d.type+' · '+d.country+' · '+s.age+(lang==='ja'?'年の人生':' years')+'\n'+d.summary+'\n#83億分の1の人生 #MBTI'}
+function shareBody(){const d=resultModel85();const intro=lang==='ja'?'MBTI診断の16タイプをもとに、もうひとつの人生を体験！':'Experience another life inspired by the 16 MBTI personality types!';return intro+'\n'+d.headline.join('')+'\n'+d.type+' · '+d.country+' · '+s.age+(lang==='ja'?'年の人生':' years')+'\n'+d.summary+'\n#83億分の1の人生 #MBTI #MBTI診断 #'+d.type}
 function shareWord(){return ''}
 function shareText(){return shareWord()+shareBody()+'\n'+resultUrl()}
 function xUrl(){return 'https://x.com/intent/post?text='+encodeURIComponent(shareWord()+shareBody())+'&url='+encodeURIComponent(resultUrl())}
