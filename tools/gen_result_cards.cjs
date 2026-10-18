@@ -12,12 +12,12 @@ const summaries=['会社を育てる挑戦が、ひとつの人生の物語に�
 for(let theme=0;theme<10;theme++){
  const c=createCanvas(LifeResultCard.width,LifeResultCard.height);
  LifeResultCard.draw(c.getContext('2d'),{lang:'ja',font:'CardFont',theme,seed:theme,brand:ctx.I18N.ja.brand,type:'LIFE',static:true,title:ctx.I18N.ja['title.'+theme],summary:summaries[theme],keywords:['人生の選択','もうひとつの人生']});
- fs.writeFileSync('share/cards/life-'+theme+'-v85.png',c.toBuffer('image/png'));
+ fs.writeFileSync('share/cards/life-'+theme+'-v91.png',c.toBuffer('image/png'));
  for(const l of langs){
   const D=ctx.I18N[l],title=D['title.'+theme]+' | '+D.brand;const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let h=fs.readFileSync('share/'+l+'/index.html','utf8');
   h=h.replace(/<title>.*?<\/title>/,'<title>'+escape(title)+'</title>').replace(/(property="og:title" content=")[^"]*/,'$1'+escape(title)).replace(/(name="twitter:title" content=")[^"]*/,'$1'+escape(title));
-  h=h.replace(/https:\/\/mbti\.businessmaker\.net\/share-preview-v(?:84\.png|89\.jpg)/g,'https://mbti.businessmaker.net/share/cards/life-'+theme+'-v85.png').replace('content="https://mbti.businessmaker.net/share/'+l+'/"','content="https://mbti.businessmaker.net/share/'+l+'/'+theme+'/"');
+  h=h.replace(/https:\/\/mbti\.businessmaker\.net\/share-preview-v(?:84\.png|89\.jpg)/g,'https://mbti.businessmaker.net/share/cards/life-'+theme+'-v91.png').replace('content="https://mbti.businessmaker.net/share/'+l+'/"','content="https://mbti.businessmaker.net/share/'+l+'/'+theme+'/"');
   h=h.replace(/(property="og:image:height" content=")\d+/,'$1'+900).replace(/(property="og:image:width" content=")\d+/,'$1'+1600).replace('One in 8.3 Billion — Life Simulator','One in 8.3 Billion — '+['Business','Family','Long life','Traveler','Career','Love','Wealth','Little joys','Challenge','Ordinary days'][theme]);
   fs.mkdirSync('share/'+l+'/'+theme,{recursive:true});fs.writeFileSync('share/'+l+'/'+theme+'/index.html',h);
  }

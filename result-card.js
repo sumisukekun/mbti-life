@@ -32,24 +32,25 @@ function art(g,x,y,w,h,theme,seed){
  g.restore();
 }
 function draw(g,d){
+ const INK='#f3f5ff',MUTED='#b1c3e4';
  const font=d.font||'sans-serif',ja=d.lang==='ja',idx=Math.max(0,Math.min(9,d.theme|0));
- g.clearRect(0,0,W,H);g.fillStyle='#edeff8';g.fillRect(0,0,W,H);round(g,23,23,W-38,H-38,26,BLUE);round(g,16,12,W-38,H-38,26,'#fdfdff',INK);
+ g.clearRect(0,0,W,H);g.fillStyle='#070d25';g.fillRect(0,0,W,H);round(g,23,23,W-38,H-38,26,'#674bad');round(g,16,12,W-38,H-38,26,'#111b38','#64dfff');
  g.textAlign='left';g.textBaseline='alphabetic';g.fillStyle=INK;fit(g,d.brand,44,1100,font);g.fillText(d.brand,54,75);if(ja){g.fillStyle=PINK;g.fillText('83',54,75);g.fillText('1',54+g.measureText('83億分の').width,75);g.fillStyle=INK}
  g.textAlign='right';g.font='700 25px '+font;g.fillText(ja?'人生の結果':'LIFE RESULT',1540,74);g.textAlign='left';
  art(g,32,110,610,670,idx,d.seed||0);
  const x=686,mw=842;
  round(g,x,117,190,63,20,PINK);g.font='700 42px '+font;g.fillStyle='#fff';g.fillText(d.type||'LIFE',x+28,163);
  const age=d.static?(ja?'選択がつくる物語':'A LIFE OF CHOICES'):(ja?d.country+'で生きた'+d.age+'年':d.country+' · '+d.age+' years');
- round(g,x+210,117,632,63,22,'#eceaff');g.fillStyle=INK;fit(g,age,32,590,font);g.fillText(age,x+230,161);
+ round(g,x+210,117,632,63,22,'#243455');g.fillStyle=INK;fit(g,age,32,590,font);g.fillText(age,x+230,161);
  const heads=d.headline||(ja?HEAD_JA:HEAD_EN)[idx];const size=Math.min(...heads.map(t=>fit(g,t,72,mw,font)));g.font='700 '+size+'px '+font;g.fillStyle=INK;
- heads.forEach((t,i)=>{g.fillStyle='#ffc4dd';g.fillRect(x,253+i*87,mw-12,18);g.fillStyle=INK;g.fillText(t,x,260+i*87)});
+ heads.forEach((t,i)=>{g.fillStyle='#54254c';g.fillRect(x,253+i*87,mw-12,18);g.fillStyle=INK;g.fillText(t,x,260+i*87)});
  g.fillStyle=MUTED;fit(g,(ja?'称号｜':'TITLE · ')+d.title,29,mw,font);g.fillText((ja?'称号｜':'TITLE · ')+d.title,x,409);
  g.fillStyle=INK;let fs=31,lines;do{g.font='500 '+fs+'px '+font;lines=wrap(g,d.summary,mw);if(lines.length<=3)break;fs-=2}while(fs>19);lines.slice(0,3).forEach((t,i)=>g.fillText(t,x,468+i*43));
- g.strokeStyle='#d7dbea';g.lineWidth=2;g.beginPath();g.moveTo(x,595);g.lineTo(1532,595);g.stroke();
+ g.strokeStyle='#354a73';g.lineWidth=2;g.beginPath();g.moveTo(x,595);g.lineTo(1532,595);g.stroke();
  if(d.static){g.fillStyle=INK;g.font='700 32px '+font;g.fillText(ja?'あなたなら、どんな人生？':'What life would you live?',x,657);g.font='500 25px '+font;g.fillStyle=MUTED;g.fillText(ja?'無料・登録不要で、もうひとつの人生へ。':'Start a new life. Free. No sign-up.',x,707)}
  else {const labels=d.labels||(ja?['仕事運','金運','愛情運','健康運']:['Work','Money','Love','Health']);['work','money','love','health'].forEach((k,i)=>{const xx=x+i*212;g.fillStyle=INK;g.font='500 26px '+font;g.fillText(labels[i],xx,638);const v=Math.max(1,Math.min(5,d.ratings[k]|0));for(let j=0;j<5;j++)star(g,xx+16+j*35,677,j<v)})}
- let xx=x;g.font='700 25px '+font;for(const t of (d.keywords||[]).slice(0,3)){const t2='#'+t,ww=g.measureText(t2).width+38;if(xx+ww>1534)break;round(g,xx,737,ww,46,23,INK);g.fillStyle='#fff';g.fillText(t2,xx+19,769);xx+=ww+12}
- g.strokeStyle='#d7dbea';g.beginPath();g.moveTo(50,811);g.lineTo(1542,811);g.stroke();g.fillStyle=MUTED;g.font='500 20px '+font;g.fillText(ja?'※ゲーム内の架空の人生です':'A fictional life in a game',54,852);
+ let xx=x;g.font='700 25px '+font;for(const t of (d.keywords||[]).slice(0,3)){const t2='#'+t,ww=g.measureText(t2).width+38;if(xx+ww>1534)break;round(g,xx,737,ww,46,8,'#284261');g.fillStyle='#fff';g.fillText(t2,xx+19,769);xx+=ww+12}
+ g.strokeStyle='#354a73';g.beginPath();g.moveTo(50,811);g.lineTo(1542,811);g.stroke();g.fillStyle=MUTED;g.font='500 20px '+font;g.fillText(ja?'※ゲーム内の架空の人生です':'A fictional life in a game',54,852);
  g.fillStyle=INK;g.textAlign='right';g.font='700 26px '+font;g.fillText(ja?'あなたなら、どんな人生？':'What life would you live?',1538,849);g.fillStyle=MUTED;g.font='500 17px '+font;g.fillText('mbti.businessmaker.net',1538,868);g.textAlign='left';
 }
 root.LifeResultCard={draw,width:W,height:H,headlinesJA:HEAD_JA,headlinesEN:HEAD_EN};

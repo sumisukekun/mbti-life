@@ -406,25 +406,46 @@ const app=document.getElementById('app');
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function topNav(){return `<nav class="topnav"><button class="brand plain" data-act="home">${tr('brand.short')}</button>
   <span class="navc">${flag(COUNTRY)}<span>${esc(CN(COUNTRY))}</span></span>
+  ${view==='home'?`<div class="navlinks91"><a href="#world91">${lang==='ja'?'遊び方・国':'Your world'}</a><a href="#types91">${lang==='ja'?'16タイプ':'16 types'}</a><a href="#daily91">${lang==='ja'?'今日の人生':'Daily life'}</a></div>`:''}
   <label class="langsel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
   <select id="langsel" aria-label="${esc(tr('home.lang'))}">${LANGS.filter(l=>I18N[l]).map(l=>`<option value="${l}"${l===lang?' selected':''}>${esc(langName(l))}</option>`).join('')}</select></label></nav>`}
+function person91(type){
+ const i=Math.max(0,ORDER.indexOf(type)),family=grp(type),shirt={nt:'#b994fa',nf:'#ff7fbd',sj:'#65d9f3',sp:'#ffd569'}[family],skin=['#ffd1a1','#c98d65','#f3bd94','#a97251'][i%4],hair=['#34304b','#794a32','#242334','#c3864e'][i%4];
+ const r=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+ let art=r(9,3,14,7,hair)+r(7,7,18,6,hair)+r(9,9,14,12,skin)+r(9,8,7,4,hair)+r(11,14,2,2,'#18213b')+r(19,14,2,2,'#18213b')+r(14,18,4,1,'#b26b62')+r(8,21,16,11,shirt)+r(5,23,3,9,skin)+r(24,23,3,9,skin)+r(10,32,5,9,'#334c6c')+r(18,32,5,9,'#334c6c')+r(8,40,7,3,'#a5b9ce')+r(18,40,7,3,'#a5b9ce');
+ if(i%4===0)art+=r(7,12,8,5,'#1e2946')+r(17,12,8,5,'#1e2946')+r(15,13,2,1,'#1e2946')+r(9,13,4,2,'#94dff4')+r(19,13,4,2,'#94dff4');
+ if(i%4===1)art+=r(6,2,20,4,'#e9b566')+r(10,0,12,3,'#f6d296')+r(25,26,5,9,'#987254');
+ if(i%4===2)art+=r(19,27,11,7,'#edf0d4')+r(20,28,4,5,'#62b4b4')+r(25,28,4,5,'#b6a0d2');
+ if(i%4===3)art+=r(3,29,7,8,'#f6d571')+r(4,27,5,2,'#f6d571')+r(4,30,5,1,'#c39232');
+ return `<svg class="person91" viewBox="0 0 32 45" shape-rendering="crispEdges" aria-hidden="true">${art}</svg>`;
+}
 function vHome(){
-  return `${topNav()}
-  <header class="hero2">
-    <div class="htext"><span class="eyebrow">${tr('hero.eyebrow')}</span>
-      <h1 class="riso">${tr('brand.html')}</h1>
-      <p class="hsub">${esc(tr('hero.sub'))}</p>
-      <p class="hstat">${esc(tr('hero.stat'))}</p></div>
-    <figure class="globe"><canvas id="globe" width="520" height="520" aria-hidden="true"></canvas><figcaption>${esc(tr('home.globe'))}</figcaption></figure>
-  </header>
-  ${vExplore83()}
-  <section class="sec"><div class="sech"><span class="stepn">01</span><h2>${esc(tr('home.country'))}</h2></div><p class="note">${esc(tr('home.countryNote'))}</p>
-    ${REGIONS.map(([r,list])=>`<div class="region"><span class="rlabel">${esc(tr('home.region.'+r))}</span><div class="cgrid">${list.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></div>`).join('')}</section>
-  <section class="sec"><div class="sech"><span class="stepn">02</span><h2>${esc(tr('home.type'))}</h2></div>
-    <div class="grid16">${ORDER.map(t=>`<button class="tbtn ${grp(t)}" data-type="${t}"><b>${t}</b><span>${esc(tr('type.'+t+'.n'))}</span></button>`).join('')}</div></section>
-  <div class="or">${esc(tr('home.or'))}</div>
-  <div class="quizcta dots"><p><b>${esc(tr('home.quizQ'))}</b><br>${esc(tr('home.quizSub'))}</p><button class="btn" data-act="quiz">${esc(tr('home.quizBtn'))}</button></div>
-  <p class="note">${esc(tr('home.note'))}</p>${footer()}`;
+ const ja=lang==='ja';
+ return `${topNav()}
+ <header class="hero91">
+  <img class="hero91art" src="assets/life-world-v91.jpg" alt="" fetchpriority="high" width="1730" height="909">
+  <div class="hero91content"><span class="hero91pill">${ja?'16タイプ × 人生シミュレーション':'16 PERSONALITIES × A WORLD OF LIVES'}</span>
+   <h1>${ja?'あなたの<em>MBTI</em>で、<br>どんな<em>人生</em>になる？':esc(tr('brand'))}</h1>
+   <p class="hero91brand">${esc(tr('brand'))}</p>
+   <p class="hero91desc">${ja?'違う国で生まれて、違う道を選んだら。<br>出会い、仕事、大切な人。<br>あなたの選択で、もうひとつの物語が動き出す。':esc(tr('hero.sub'))}</p>
+   <div class="hero91actions"><button class="btn" data-act="random83">${ja?'▶ 今すぐ、人生をはじめる':'▶ Start a new life'}</button><button class="btn ghost" data-act="world91">${ja?'自分のタイプで遊ぶ ↓':'Choose my type ↓'}</button></div>
+   <div class="hero91micro"><span>${ja?'無料・登録不要':'Free · No sign-up'}</span><span>${ja?'スマホでも遊べる':'Play in your browser'}</span><span>${ja?'結果カードをシェア':'Share your life card'}</span></div>
+   <span class="hero91scroll">YOUR CHOICES. YOUR STORY.</span>
+  </div>
+ </header>
+ <section class="worldintro91"><div><span class="eyebrow">A DIFFERENT LIFE AWAITS</span><h2>${ja?'まだ知らない自分に、会いにいこう。':'Meet a life you have never lived.'}</h2></div><p>${ja?'同じタイプでも、選択が違えば人生は変わる。<br>あなたは挑戦する？ 大切な人との時間を選ぶ？':'Same personality. Different choices. A story of your own.'}</p></section>
+ <section class="steps91" aria-label="${ja?'遊び方':'How to play'}">
+  <article><b>01</b><h3>${ja?'国とタイプを選ぶ':'Choose a country & type'}</h3><p>${ja?'ランダムですぐ始めてもOK':'Or let fate choose for you.'}</p></article>
+  <article><b>02</b><h3>${ja?'人生の分かれ道を選ぶ':'Make your life choices'}</h3><p>${ja?'仕事も恋も、あなたのペースで':'Work, love and life, at your pace.'}</p></article>
+  <article><b>03</b><h3>${ja?'人生をカードに残す':'Discover your life card'}</h3><p>${ja?'友達と見せ合って楽しもう':'Share and compare with friends.'}</p></article>
+ </section>
+ <section id="world91" class="sec sec91"><div class="sech"><span class="stepn">01</span><h2>${esc(tr('home.country'))}</h2></div><p class="note">${esc(tr('home.countryNote'))}</p>
+ ${REGIONS.map(([r,list])=>`<div class="region"><span class="rlabel">${esc(tr('home.region.'+r))}</span><div class="cgrid">${list.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></div>`).join('')}</section>
+ <section id="types91" class="sec sec91"><div class="sech"><span class="stepn">02</span><h2>${esc(tr('home.type'))}</h2></div><p class="note">${ja?'知っているタイプを選んで、あなただけの人生へ。':'Choose your personality to start your own story.'}</p>
+ <div class="grid16">${ORDER.map(t=>`<button class="tbtn ${grp(t)==='sp'?'tg-sp':grp(t)}" data-type="${t}">${person91(t)}<b>${t}</b><span>${esc(tr('type.'+t+'.n'))}</span><small>${esc(tr('type.'+t+'.d'))}</small></button>`).join('')}</div></section>
+ <div class="or">${esc(tr('home.or'))}</div><div class="quizcta"><p><b>${esc(tr('home.quizQ'))}</b><br>${esc(tr('home.quizSub'))}</p><button class="btn ghost" data-act="quiz">${esc(tr('home.quizBtn'))} ↗</button></div>
+ ${vExplore83()}
+ <p class="worldnote91">${ja?'「83億」は世界の一人ひとりをイメージしたタイトルです。16か国・16タイプを舞台にしたエンタメ用のフィクションで、実際の人生や性格・将来を予測するものではありません。':'8.3 billion symbolizes individual lives. Fiction featuring 16 countries and 16 personality types, for entertainment; not a prediction of your real life or future.'}</p>${footer()}`;
 }
 function vQuiz(){
   const n=qi+1;
@@ -436,7 +457,7 @@ function vQuiz(){
 }
 function vCard(type,fromQuiz){
   return `${topNav()}<span class="eyebrow">${esc(tr(fromQuiz?'card.fromQuiz':'card.yours'))}</span>
-  <div class="tcard"><div class="code">${type}</div><h2>${esc(tr('type.'+type+'.n'))}</h2><p>${esc(tr('type.'+type+'.d'))}</p>
+  <div class="tcard">${person91(type)}<div class="code">${type}</div><h2>${esc(tr('type.'+type+'.n'))}</h2><p>${esc(tr('type.'+type+'.d'))}</p>
   <div class="axes">${[...type].map(c=>`<div><b>${c}</b>${esc(tr('axis.'+c))}</div>`).join('')}</div></div>
   <p>${esc(tr('card.lead',{country:CN(COUNTRY)}))}</p>
   <div class="row"><button class="btn" data-act="setup" data-type="${type}">${esc(tr('card.go'))}</button><button class="btn ghost" data-act="home">${esc(tr('card.change'))}</button></div>`;
@@ -502,12 +523,13 @@ function syncSetup(){
 const YEAR0=new Date().getFullYear();
 const yearOf=age=>YEAR0+(age-s.startAge);
 function bar(label,v,color){return `<div class="bar"><span>${esc(label)}</span><span class="tr"><i style="width:${v}%;background:${color}"></i></span><span class="v">${Math.round(v)}</span></div>`}
-function avatar(){
+function oldAvatar91(){
   let x=s.seed||1;const r=()=>{x=(x*1103515245+12345)%2147483648;return x/2147483648};
   const col={nt:'var(--blue)',nf:'var(--pink)',sj:'var(--good)',sp:'var(--sun)'}[grp(s.type)];
   let rects='';for(let y=0;y<7;y++)for(let i=0;i<4;i++){if(r()<.55){const xs=i===3?[3]:[i,6-i];xs.forEach(xx=>rects+=`<rect x="${xx}" y="${y}" width="1" height="1"/>`)}}
   return `<svg class="ava" viewBox="-1 -1 9 9" aria-hidden="true"><rect x="-1" y="-1" width="9" height="9" fill="var(--paper)"/><g fill="${col}">${rects}</g></svg>`;
 }
+function avatar(){return person91(s.type)}
 function phase(){return s.dead?'—':s.uni?tr('ph.student',{edu:eduName(s.edu)}):s.working?(s.founder?tr('ph.founder'):tr(s.job||'job.default')):s.retired?tr('ph.retired'):s.homemaker?tr('ph.home'):tr('ph.seek')}
 function kidLabel(){if(!s.kids)return tr('fam.none');
   return s.kidAges.slice(0,s.kids).map((b,i)=>({a:s.age-b,i})).filter(o=>o.a>=0).map(o=>tr('kid.item',{nth:tr('kid.'+Math.min(o.i,3)),name:s.kidNames[o.i]||'',age:o.a})).join(' · ')||tr('u.people',{n:s.kids})}
@@ -626,7 +648,7 @@ const SHARE_URL='https://mbti.businessmaker.net/';
 function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
 function shareData(){return {t:s.type,a:s.age,ti:titleIdx(),r:ratings(),kw:keywords(),c:curve(24),l:lang,cc:s.country}}
-function resultUrl(){return SHARE_URL+'share/'+lang+'/'+titleIdx()+'/?r='+encodeURIComponent(enc(shareData()))}
+function resultUrl(){return SHARE_URL+'share/'+lang+'/'+titleIdx()+'/?v=91&r='+encodeURIComponent(enc(shareData()))}
 function shareBody(){const d=resultModel85();const intro=lang==='ja'?'MBTI診断の16タイプをもとに、もうひとつの人生を体験！':'Experience another life inspired by the 16 MBTI personality types!';return intro+'\n'+d.headline.join('')+'\n'+d.type+' · '+d.country+' · '+s.age+(lang==='ja'?'年の人生':' years')+'\n'+d.summary+'\n#83億分の1の人生 #MBTI #MBTI診断 #'+d.type}
 function shareWord(){return ''}
 function shareText(){return shareWord()+shareBody()+'\n'+resultUrl()}
@@ -827,6 +849,7 @@ function render(){
   const newChoice90=!!choiceKey90&&choiceKey90!==shownDecision90;shownDecision90=choiceKey90;
   if(view!=='finale')sceneOverride=null;
   app.innerHTML=view==='home'?vHome():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():view==='finale'?vFinale():vEnd();
+  app.setAttribute?.('data-view',view);
   app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',view==='home');
   document.body.classList.toggle('dark-stage',view==='finale');
   if(view==='setup')syncSetup();
@@ -860,6 +883,7 @@ app.addEventListener('click',e=>{
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
   if(b.dataset.speed){const running=!!timer;speed=+b.dataset.speed;untilChoice=false;if(running&&!pending&&!s.dead)play();render();return}
   const a=b.dataset.act;
+  if(a==='world91'){document.getElementById('world91')?.scrollIntoView?.({behavior:'smooth',block:'start'});return}
   if(a==='choice90'){focusDecision90();return}
   if(a==='back86'){seekAge86(s.age-1);return}
   if(a==='forward86'){forwardYear86();return}
@@ -933,7 +957,7 @@ function day83(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'})
 function hash83(v){let h=2166136261;for(const c of v)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
 function history83(){try{const h=JSON.parse(ls('life83.history')||'[]');return Array.isArray(h)?h.slice(0,24):[]}catch(e){return []}}
 function save83(){if(!s||!s.dead)return;const h=history83();const id=s.seed+'-'+s.age+'-'+s.type;if(h.some(x=>x.id===id))return;h.unshift({id,type:s.type,country:s.country,age:s.age,title:title(),day:day83()});ls('life83.history',JSON.stringify(h.slice(0,24)))}
-function vExplore83(){const ja=lang==='ja',h=history83();return `<section class="sec explore83"><span class="eyebrow">ONE WORLD · YOUR CHOICES</span><h2>${ja?'もし、別の人生を生きられたら。':'What if you lived another life?'}</h2><p>${ja?'設定なしですぐに始める。性格と国をランダムに選び、18歳から人生の選択を体験します。':'Start instantly with a random personality and country, from age 18.'}</p><div class="row"><button class="btn pinkbtn" data-act="random83">${ja?'運命にまかせて始める':'Start a random life'}</button><button class="btn" data-act="daily83">${ja?'今日の共通チャレンジ':'Daily challenge'}</button></div><p class="note">${ja?'毎日0時（日本時間）に更新。同じ初期条件から、選択で変わる人生を友達と比べよう。':'Resets at midnight Japan time. Same starting conditions, different choices.'}</p><p class="note">${ja?'「83億」は世界の一人ひとりをイメージしたタイトルです。現在は16か国・16タイプを舞台にしたフィクションで、人口比率の再現や83億通りの保証ではありません。':'83億 (8.3 billion) symbolizes individual lives around the world. Fiction featuring 16 countries and 16 personality types; not population-weighted or a guarantee of 8.3 billion outcomes.'}</p>${h.length?`<h3>${ja?'この端末の人生コレクション':'Lives on this device'} · ${h.length}/24</h3><ul class="mslist">${h.slice(0,6).map(x=>`<li><span>${esc(x.type)}</span>${esc(x.title)} · ${esc(CN(x.country))} · ${esc(x.age)} ${ja?'歳':'years'}</li>`).join('')}</ul><p class="note">${ja?'履歴はこのブラウザだけに保存されます。':'History is stored only in this browser.'}</p>`:''}</section>`}
+function vExplore83(){const ja=lang==='ja',h=history83();return `<section id="daily91" class="daily91"><div><span class="eyebrow">TODAY’S SHARED STORY</span><h2>${ja?'同じはじまり。違う人生。':'Same beginning. Different lives.'}</h2><p>${ja?'今日の共通チャレンジ。友達と同じ国・同じタイプから始めて、選択で変わる物語を比べよう。毎日0時（日本時間）に更新。':'Start with the same country and type as your friends. Compare where your choices lead. Resets at midnight Japan time.'}</p></div><button class="btn pinkbtn" data-act="daily83">${ja?'今日の共通チャレンジ →':'Play today’s challenge →'}</button></section>${h.length?`<section class="collection91"><h3>${ja?'この端末の人生コレクション':'Lives on this device'} · ${h.length}/24</h3><ul class="mslist">${h.slice(0,6).map(x=>`<li><span>${esc(x.type)}</span>${esc(x.title)} · ${esc(CN(x.country))} · ${esc(x.age)} ${ja?'歳':'years'}</li>`).join('')}</ul><p class="note">${ja?'履歴はこのブラウザだけに保存されます。':'History is stored only in this browser.'}</p></section>`:''}`}
 function launch83(daily){stop();clearTimeout(fin.t);pending=null;autoSkip=false;speed=1;untilChoice=false;rng83=daily?hash83('life83-v1-'+day83()):null;COUNTRY=pick(CORDER);const t=pick(ORDER);prof={...DEF,age:18,status:'student',school:'hs'};startLife(t,prof);s.challenge83=daily?day83():null;view='life';render();scrollTo(0,0);if(!pending)play()}
 applyLang();
 render();

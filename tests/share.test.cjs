@@ -15,7 +15,7 @@ for(const f of ['i18n/ja.js','scene.js','result-card.js','app.js'])vm.runInConte
    const model=vm.runInContext(`s=Object.assign(JSON.parse(originalState),{founder:false,startup:false,money:0,kids:0,grand:0,love:30,age:70,trips:0,career:10,happy:40,pname:'DO_NOT_SHARE_PERSONAL_NAME'},scenario);resultModel85()`,c);
    assert.equal(model.theme,i);assert.equal(model.age,vm.runInContext('s.age',c));assert(!JSON.stringify(model).includes('DO_NOT_SHARE_PERSONAL_NAME'));
    assert.match(new URL(vm.runInContext('resultUrl()',c)).pathname,new RegExp('/'+i+'/$'));
-   const page=fs.readFileSync(`share/ja/${i}/index.html`,'utf8');assert(page.includes(`life-${i}-v85.png`));
+   const page=fs.readFileSync(`share/ja/${i}/index.html`,'utf8');assert(page.includes(`life-${i}-v91.png`));
  }
  c.originalState=original;vm.runInContext('s=JSON.parse(originalState)',c);
  const status={},im={src:'data:image/png;base64,eA=='};c.document.getElementById=id=>id==='cardimg'?im:status;
