@@ -6,6 +6,14 @@ let intervalMs;
 const c={btoa,atob,console,URLSearchParams,URL,Intl,Date,Math,JSON,location:{search:'',pathname:'/'},navigator:{language:'ja'},localStorage:{getItem(){return null},setItem(){}},document:{getElementById(id){return id==='adwrap'?null:el},documentElement:{},body:{classList:{toggle(){}}},addEventListener(){}},setTimeout(){},clearTimeout(){},setInterval(fn,ms){intervalMs=ms;return 1},clearInterval(){},requestAnimationFrame(){return 1},scrollTo(){},I18N:{}};c.window=c;vm.createContext(c);
 for(const f of ['i18n/ja.js','scene.js','result-card.js','app.js'])vm.runInContext(fs.readFileSync(f,'utf8'),c);
 const run=s=>vm.runInContext(s,c);
+// The main entry must require an explicit MBTI selection before any life starts.
+const click93=dataset=>click90({target:{closest(){return {dataset}}}});
+assert.equal((run('vHome()').match(/data-act="start93"/g)||[]).length,1);
+assert(!run('vHome()').includes('data-type='));assert(!run('vHome()').includes('data-act="random83"'));
+click93({act:'start93'});assert.equal(run('view'),'types93');assert.equal(run('s'),null);assert.equal((run('vTypes93()').match(/data-type=/g)||[]).length,16);
+click93({act:'begin',type:'INFP'});assert.equal(run('view'),'types93');assert.equal(run('s'),null);
+click93({type:'ENTJ'});assert.equal(run('view'),'card');assert.equal(run('cardType'),'ENTJ');assert.equal(run('s'),null);
+assert(run('vSetup(cardType)').includes('data-type="ENTJ"'));assert(run('vSetup(cardType)').includes('data-act="country93"'));
 run('launch83(true);stop()');
 assert.equal(run('timeline86.length'),1);assert.equal(run('pending.id'),'grad');
 run('seekAge86(18);resolve(0);stop()');assert.equal(run('timer'),null);assert.equal(run('manual86'),true);

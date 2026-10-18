@@ -406,7 +406,6 @@ const app=document.getElementById('app');
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function topNav(){return `<nav class="topnav"><button class="brand plain" data-act="home">${tr('brand.short')}</button>
   <span class="navc">${flag(COUNTRY)}<span>${esc(CN(COUNTRY))}</span></span>
-  ${view==='home'?`<div class="navlinks91"><a href="#world91">${lang==='ja'?'遊び方・国':'Your world'}</a><a href="#types91">${lang==='ja'?'16タイプ':'16 types'}</a><a href="#daily91">${lang==='ja'?'今日の人生':'Daily life'}</a></div>`:''}
   <label class="langsel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
   <select id="langsel" aria-label="${esc(tr('home.lang'))}">${LANGS.filter(l=>I18N[l]).map(l=>`<option value="${l}"${l===lang?' selected':''}>${esc(langName(l))}</option>`).join('')}</select></label></nav>`}
 function person91(type){
@@ -428,25 +427,23 @@ function vHome(){
    <h1>${ja?'あなたの<em>MBTI</em>で、<br>どんな<em>人生</em>になる？':esc(tr('brand'))}</h1>
    <p class="hero91brand">${esc(tr('brand'))}</p>
    <p class="hero91desc">${ja?'違う国で生まれて、違う道を選んだら。<br>出会い、仕事、大切な人。<br>あなたの選択で、もうひとつの物語が動き出す。':esc(tr('hero.sub'))}</p>
-   <div class="hero91actions"><button class="btn" data-act="random83">${ja?'▶ 今すぐ、人生をはじめる':'▶ Start a new life'}</button><button class="btn ghost" data-act="world91">${ja?'自分のタイプで遊ぶ ↓':'Choose my type ↓'}</button></div>
+   <div class="hero91actions"><button class="btn" data-act="start93">${ja?'▶ 今すぐ人生を始める':'▶ Start your life'}</button></div>
    <div class="hero91micro"><span>${ja?'無料・登録不要':'Free · No sign-up'}</span><span>${ja?'スマホでも遊べる':'Play in your browser'}</span><span>${ja?'結果カードをシェア':'Share your life card'}</span></div>
    <span class="hero91scroll">YOUR CHOICES. YOUR STORY.</span>
   </div>
  </header>
- <section class="worldintro91"><div><span class="eyebrow">A DIFFERENT LIFE AWAITS</span><h2>${ja?'まだ知らない自分に、会いにいこう。':'Meet a life you have never lived.'}</h2></div><p>${ja?'同じタイプでも、選択が違えば人生は変わる。<br>あなたは挑戦する？ 大切な人との時間を選ぶ？':'Same personality. Different choices. A story of your own.'}</p></section>
- <section class="steps91" aria-label="${ja?'遊び方':'How to play'}">
-  <article><b>01</b><h3>${ja?'国とタイプを選ぶ':'Choose a country & type'}</h3><p>${ja?'ランダムですぐ始めてもOK':'Or let fate choose for you.'}</p></article>
-  <article><b>02</b><h3>${ja?'人生の分かれ道を選ぶ':'Make your life choices'}</h3><p>${ja?'仕事も恋も、あなたのペースで':'Work, love and life, at your pace.'}</p></article>
-  <article><b>03</b><h3>${ja?'人生をカードに残す':'Discover your life card'}</h3><p>${ja?'友達と見せ合って楽しもう':'Share and compare with friends.'}</p></article>
- </section>
- <section id="world91" class="sec sec91"><div class="sech"><span class="stepn">01</span><h2>${esc(tr('home.country'))}</h2></div><p class="note">${esc(tr('home.countryNote'))}</p>
- ${REGIONS.map(([r,list])=>`<div class="region"><span class="rlabel">${esc(tr('home.region.'+r))}</span><div class="cgrid">${list.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></div>`).join('')}</section>
- <section id="types91" class="sec sec91"><div class="sech"><span class="stepn">02</span><h2>${esc(tr('home.type'))}</h2></div><p class="note">${ja?'知っているタイプを選んで、あなただけの人生へ。':'Choose your personality to start your own story.'}</p>
+ ${footer()}`;
+}
+function vTypes93(){const ja=lang==='ja';return `${topNav()}<p class="flow93">${ja?'START YOUR STORY · まずはあなたのMBTI':'START YOUR STORY · YOUR MBTI FIRST'}</p>
+ <section id="types91" class="sec sec91"><div class="sech"><span class="stepn">01</span><h2>${esc(tr('home.type'))}</h2></div><p class="note">${ja?'知っているタイプを選んで、あなただけの人生へ。':'Choose your personality to start your own story.'}</p>
  <div class="grid16">${ORDER.map(t=>`<button class="tbtn ${grp(t)==='sp'?'tg-sp':grp(t)}" data-type="${t}">${person91(t)}<b>${t}</b><span>${esc(tr('type.'+t+'.n'))}</span><small>${esc(tr('type.'+t+'.d'))}</small></button>`).join('')}</div></section>
  <div class="or">${esc(tr('home.or'))}</div><div class="quizcta"><p><b>${esc(tr('home.quizQ'))}</b><br>${esc(tr('home.quizSub'))}</p><button class="btn ghost" data-act="quiz">${esc(tr('home.quizBtn'))} ↗</button></div>
- ${vExplore83()}
- <p class="worldnote91">${ja?'「83億」は世界の一人ひとりをイメージしたタイトルです。16か国・16タイプを舞台にしたエンタメ用のフィクションで、実際の人生や性格・将来を予測するものではありません。':'8.3 billion symbolizes individual lives. Fiction featuring 16 countries and 16 personality types, for entertainment; not a prediction of your real life or future.'}</p>${footer()}`;
-}
+ ${footer()}`}
+function vCountry93(){return `${topNav()}
+ <section id="world91" class="sec sec91"><div class="sech"><span class="stepn">02</span><h2>${esc(tr('home.country'))}</h2></div><p class="note">${esc(tr('home.countryNote'))}</p>
+ ${REGIONS.map(([r,list])=>`<div class="region"><span class="rlabel">${esc(tr('home.region.'+r))}</span><div class="cgrid">${list.map(c=>`<button class="cbtn${c===COUNTRY?' on':''}" data-country="${c}" aria-pressed="${c===COUNTRY}">${flag(c)}<b>${esc(CN(c))}</b><span>${esc(tr('home.speaks',{lang:langName(COUNTRIES[c].lang)}))}</span></button>`).join('')}</div></div>`).join('')}</section>
+ <button class="btn" data-act="countrydone93">${lang==='ja'?'この国で続ける →':'Continue with this country →'}</button>`}
+
 function vQuiz(){
   const n=qi+1;
   return `${topNav()}<div class="row" style="justify-content:space-between;align-items:center"><button class="btn small ghost" data-act="home">${esc(tr('quiz.quit'))}</button><span class="eyebrow">Q${n} / ${QUIZ.length}</span></div>
@@ -460,7 +457,7 @@ function vCard(type,fromQuiz){
   <div class="tcard">${person91(type)}<div class="code">${type}</div><h2>${esc(tr('type.'+type+'.n'))}</h2><p>${esc(tr('type.'+type+'.d'))}</p>
   <div class="axes">${[...type].map(c=>`<div><b>${c}</b>${esc(tr('axis.'+c))}</div>`).join('')}</div></div>
   <p>${esc(tr('card.lead',{country:CN(COUNTRY)}))}</p>
-  <div class="row"><button class="btn" data-act="setup" data-type="${type}">${esc(tr('card.go'))}</button><button class="btn ghost" data-act="home">${esc(tr('card.change'))}</button></div>`;
+  <div class="row"><button class="btn" data-act="setup" data-type="${type}">${esc(tr('card.go'))}</button><button class="btn ghost" data-act="types93">${esc(tr('card.change'))}</button></div>`;
 }
 function radios(name,opts,cur){return `<div class="seg">${opts.map(o=>`<label><input type="radio" name="${name}" id="${name}-${o[0]}" value="${o[0]}" ${String(o[0])===String(cur)?'checked':''}><span>${esc(o[1])}</span></label>`).join('')}</div>`}
 function sel(id,opts,cur,label){return `<select class="sel" id="${id}" aria-label="${esc(label)}">${opts.map(o=>`<option value="${o[0]}" ${String(o[0])===String(cur)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`}
@@ -471,7 +468,7 @@ function vSetup(type){
   <h2 class="riso" style="margin:0;font-size:26px">${esc(tr('setup.title'))}</h2>
   <p style="margin:0;color:var(--muted)">${esc(tr('setup.lead',{country:CN(COUNTRY)}))}</p>
   <form class="setup" id="setupform">
-    <div class="field"><span>${esc(tr('p.country'))}</span><button type="button" class="cchip" data-act="home">${flag(COUNTRY)}<b>${esc(CN(COUNTRY))}</b><span>↺</span></button></div>
+    <div class="field"><span>${esc(tr('p.country'))}</span><button type="button" class="cchip" data-act="country93">${flag(COUNTRY)}<b>${esc(CN(COUNTRY))}</b><span>↺</span></button></div>
     ${fld(tr('setup.age'),`<div class="agebox"><output id="ageout">${prof.age}</output><input type="range" id="age" min="15" max="80" value="${prof.age}" aria-label="${esc(tr('setup.age'))}"></div>`)}
     ${fld(tr('setup.status'),radios('status',[['student',tr('st.student')],['work',tr('st.work')],['none',tr('st.none')]],prof.status))}
     <div class="grp" data-for="student">
@@ -834,9 +831,9 @@ function render(){
   const choiceKey90=view==='life'&&pending?s.seed+':'+s.age+':'+s.decisions+':'+pending.id:null;
   const newChoice90=!!choiceKey90&&choiceKey90!==shownDecision90;shownDecision90=choiceKey90;
   if(view!=='finale')sceneOverride=null;
-  app.innerHTML=view==='home'?vHome():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():view==='finale'?vFinale():vEnd();
+  app.innerHTML=view==='home'?vHome():view==='types93'?vTypes93():view==='country93'?vCountry93():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():view==='finale'?vFinale():vEnd();
   app.setAttribute?.('data-view',view);
-  app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',view==='home');
+  app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',['home','types93','country93'].includes(view));
   document.body.classList.toggle('dark-stage',view==='finale');
   if(view==='setup')syncSetup();
   if(view==='end')drawCard().catch(()=>imageStatus84(lang==='ja'?'画像を作成できませんでした。共有画面を閉じて、もう一度開いてください。':'Could not prepare the image. Close this dialog and try again.'));
@@ -869,18 +866,21 @@ app.addEventListener('click',e=>{
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
   if(b.dataset.speed){const running=!!timer;speed=+b.dataset.speed;untilChoice=false;if(running&&!pending&&!s.dead)play();render();return}
   const a=b.dataset.act;
-  if(a==='world91'){document.getElementById('world91')?.scrollIntoView?.({behavior:'smooth',block:'start'});return}
+  if(a==='start93'){cardType=null;cardFromQuiz=false;go('types93');return}
+  if(a==='types93'||a==='world91'){go('types93');return}
+  if(a==='country93'){readSetup();go('country93');return}
+  if(a==='countrydone93'){go('setup');return}
   if(a==='choice90'){focusDecision90();return}
   if(a==='back86'){seekAge86(s.age-1);return}
   if(a==='forward86'){forwardYear86();return}
   if(a==='latest86'){seekAge86(timeline86.at(-1)?.state.age||s.age);return}
-  if(a==='random83'||a==='daily83'){launch83(a==='daily83');return}
+  if(a==='random83'||a==='daily83'){cardType=null;go('types93');return}
   if(a==='home'){if(friend){friend=null;try{history.replaceState(null,'',location.pathname)}catch(e){}}clearTimeout(fin.t);go('home')}
   if(a==='setup'){cardType=b.dataset.type;go('setup')}
   if(a==='quiz'){qi=0;qa=[];go('quiz')}
-  if(a==='begin'){rng83=null;stop();pending=null;autoSkip=false;speed=1;const p=view==='setup'?readSetup():prof;startLife(b.dataset.type,p);
+  if(a==='begin'){if(!ORDER.includes(b.dataset.type)||cardType!==b.dataset.type){go('types93');return}rng83=null;stop();pending=null;autoSkip=false;speed=1;const p=view==='setup'?readSetup():prof;startLife(b.dataset.type,p);
     view='life';render();scrollTo(0,0);if(!pending)play()}
-  if(a==='quick'){rng83=null;pending=null;startLife(b.dataset.type,readSetup());quickRun();return}
+  if(a==='quick'){if(!ORDER.includes(b.dataset.type)||cardType!==b.dataset.type){go('types93');return}rng83=null;pending=null;startLife(b.dataset.type,readSetup());quickRun();return}
   if(a==='toggle'){timer?stop():play();render()}
   if(a==='next'){if(pending){stop();render();focusDecision90();return}untilChoice=true;play();render()}
   if(a==='autotoggle'){autoSkip=!autoSkip;if(autoSkip){if(pending)resolveAuto();if(!s.dead)play()}render()}
