@@ -16,7 +16,7 @@ render=function(){lifeStop();if(view==='lifeSetup'||view==='watch'){drawId++;APP
 go=function(v){lifeStop();originalGo(v);};
 function lifeSeek(i){lifeCursor=Math.max(0,Math.min(i,lifeHistory.length-1));life=JSON.parse(JSON.stringify(lifeHistory[lifeCursor]));game=life.game;lifeRunning=false;store('love.watch.v2',life);render();}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act;let handled=true;
- if(act==='start'||act==='retry'){ownType=ownType||game.code;friend=false;go('lifeSetup');}
+ if(act==='start'||act==='retry'){ownType=act==='retry'?game.code:ownType;friend=false;go('lifeSetup');}
  else if(act==='lifeBegin'){const profile={relation:$('input[name="relation"]:checked').value,focus:$('input[name="focus"]:checked').value};life=W.init(ownType,profile);lifeHistory=[];lifeCursor=-1;lifeRecord();filmTime=0;lifeRunning=true;go('watch');}
  else if(act==='resume'){life=W.restore(read('love.watch.v2'));if(life){ownType=life.game.code;game=life.game;friend=false;const h=read('love.watch.history.v2');lifeHistory=Array.isArray(h)?h.filter(x=>x&&x.version===2&&x.game&&x.game.code===game.code):[];lifeCursor=lifeHistory.findIndex(x=>x.beat===life.beat&&x.game.log.length===life.game.log.length);if(lifeCursor<0){lifeHistory=[life];lifeCursor=0;}lifeRunning=false;go(life.done?'result':'watch');}else{const old=C.restore(read('love.game.v1'));ownType=old?old.code:ownType;if(ownType)go('lifeSetup');else go('quiz');}}
  else if(act==='lifePause'){lifeRunning=!lifeRunning;render();}
@@ -24,7 +24,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  else if(act==='lifeChoice'){life=W.choose(life,Number(b.dataset.option));lifeRecord();lifeRunning=true;render();}
  else if(act==='lifeNext'){if(life.pending!==null){toast('ここは、あなたが選ぶ大切な場面です');}else{let guard=0;do{life=W.advance(life);lifeRecord();}while(!life.done&&life.pending===null&&guard++<200);lifeRunning=false;if(life.done)go('result');else render();}}
  else if(act==='lifeBack'){let i=lifeCursor-1;while(i>0&&lifeHistory[i].age>life.age-1)i--;lifeSeek(i);}
- else if(act==='back'&&lifeHistory.length&&life){const i=lifeHistory.findLastIndex(x=>x.pending!==null);lifeSeek(Math.max(0,i));go('watch');}
+ else if(act==='back'&&lifeHistory.length&&life){const i=lifeHistory.findLastIndex(x=>x.pending!==null);view='watch';lifeSeek(Math.max(0,i));window.scrollTo({top:0,behavior:'instant'});}
  else handled=false;
  if(handled){e.preventDefault();e.stopImmediatePropagation();}
 },true);
