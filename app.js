@@ -614,7 +614,7 @@ const SHARE_URL='https://mbti.businessmaker.net/';
 function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
 function shareData(){return {t:s.type,a:s.age,ti:titleIdx(),r:ratings(),kw:keywords(),c:curve(24),l:lang,cc:s.country}}
-function resultUrl(){return SHARE_URL+'?lang='+encodeURIComponent(lang)+'&r='+encodeURIComponent(enc(shareData()))}
+function resultUrl(){return SHARE_URL+'share/'+lang+'/?r='+encodeURIComponent(enc(shareData()))}
 function shareBody(){return tr('share.text',{type:s.type,title:title(),age:s.age,country:CN(s.country),kw:keywords().map(k=>tr(k)).join(tr('kw.sep'))})}
 function shareWord(){const w=document.getElementById('shword');return w&&w.value.trim()?w.value.trim().slice(0,140)+'\n\n':''}
 function shareText(){return shareWord()+shareBody()+'\n'+resultUrl()}
@@ -735,7 +735,7 @@ function vEnd(){
     <div class="fscene"><canvas id="fscene" width="${SW}" height="${SH}" role="img" aria-label="${esc(tr(bs.label))}"></canvas></div>
   </figure>
   <div class="ractions xrow">
-    <a class="btn xbtn" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(tr('sh.x'))}</a>
+    <button class="btn xbtn" data-act="shopen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(lang==='ja'?'Xに画像付きで投稿':'Share an image on X')}</button>
   </div>
   <section class="sec"><h3>${esc(tr('rec.highlights'))}</h3><ul class="mslist">${hl.map(m=>`<li><span>${esc(tr('u.age',{n:m[0]}))}</span>${esc(tr(m[1],m[2]))}</li>`).join('')||`<li><span>—</span>${esc(tr('rec.quiet'))}</li>`}</ul></section>
   <div class="ractions">
@@ -753,10 +753,19 @@ function vShare(){
   return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="mbox">
     <div class="mhead"><h3 id="shT">${esc(tr('sh.title'))}</h3><button class="mx" data-act="shclose" aria-label="${esc(tr('sh.close'))}">×</button></div>
     <p class="mlead">${esc(tr('sh.lead'))}</p>
+    <section class="xsteps" aria-label="${lang==='ja'?'Xへの画像投稿手順':'Image sharing steps'}">
+      <h4>${lang==='ja'?'Xに結果画像を付けて投稿':'Post your result image on X'}</h4>
+      <ol><li>${lang==='ja'?'下の「結果画像をコピー」を押す。使えない場合は「画像を保存」。':'Copy your result image below, or save it if copying is unavailable.'}</li>
+      <li>${lang==='ja'?'「Xの投稿画面を開く」を押す。文章とリンクが入ります。':'Open the X composer. Your text and link will be filled in.'}</li>
+      <li>${lang==='ja'?'投稿欄をクリックし Ctrl＋V（Macは⌘＋V）。保存した場合は写真ボタンで添付し、画像を確認して投稿。':'Paste into the composer (Ctrl+V / ⌘+V), or attach the saved file with the photo button. Check the image before posting.'}</li></ol>
+      <p class="note">${lang==='ja'?'リンクのプレビューとは別に、今回の年齢・称号・評価が入った画像を添付できます。':'Attach your exact age, life title and ratings as an image, separately from the link preview.'}</p>
+      <button class="btn pinkbtn wide" data-act="copyimg" id="copyimg" disabled>${lang==='ja'?'結果画像をコピー':'Copy result image'}</button>
+      <p id="imgstatus" role="status" aria-live="polite">${lang==='ja'?'画像を準備しています…':'Preparing your image…'}</p>
+    </section>
     <label class="mword"><span>${esc(tr('sh.word'))}</span><textarea id="shword" rows="2" maxlength="140" placeholder="${esc(tr('sh.wordPh'))}"></textarea></label>
     <button class="btn pinkbtn wide" data-act="nshare" id="nshare" hidden>${esc(tr('sh.img'))}</button>
     <div class="mgrid">
-      <a class="sbtn" id="shx" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(tr('sh.x'))}</a>
+      <a class="sbtn" id="shx" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(lang==='ja'?'Xの投稿画面を開く':'Open X composer')}</a>
       <a class="sbtn" id="shth" href="${threadsUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.2 22c-3 0-5.3-1-6.8-2.9C4 17.4 3.3 15 3.3 12s.7-5.4 2.1-7.1C6.9 3 9.2 2 12.2 2c2.3 0 4.2.6 5.6 1.7 1.3 1 2.2 2.5 2.7 4.3l-2 .5c-.8-3-3-4.5-6.3-4.5-2.4 0-4.2.7-5.3 2.2-1 1.3-1.6 3.3-1.6 5.8s.5 4.5 1.6 5.8c1.1 1.5 2.9 2.2 5.3 2.2 2.1 0 3.6-.5 4.8-1.6 1.3-1.2 1.3-2.7.9-3.6-.2-.5-.6-1-1.1-1.3-.1 1-.4 1.8-.9 2.5-.8 1-1.9 1.6-3.3 1.7-1.1.1-2.1-.2-2.9-.7-.9-.6-1.4-1.5-1.5-2.5-.1-2 1.5-3.4 4-3.6.9-.1 1.7 0 2.5.1-.1-.6-.3-1-.6-1.3-.4-.5-1.1-.7-2-.7-1.2 0-2 .4-2.6 1.2l-1.6-1.1c.9-1.3 2.3-2 4.2-2 1.5 0 2.6.5 3.4 1.4.7.8 1 1.9 1.1 3.3.6.3 1.1.6 1.5 1.1.7.8 1.1 1.9 1.1 3.1 0 1.5-.6 3-1.9 4.1-1.5 1.4-3.5 2.1-6.1 2.2Zm.5-9.2h-.5c-1.6.1-2.4.8-2.4 1.6.1.9 1 1.3 2 1.2 1.6-.1 2.3-1.1 2.5-2.6-.5-.1-1-.2-1.6-.2Z"/></svg>${esc(tr('sh.threads'))}</a>
       <button class="sbtn" data-act="copy">${esc(tr('sh.copy'))}</button>
       <button class="sbtn" data-act="saveimg">${esc(tr('sh.save'))}</button>
@@ -801,6 +810,8 @@ async function drawCard(){
   g.fillStyle=INK;g.fillRect(40,H-96,W-96,40);g.fillStyle='#fff';g.font='700 22px '+BD;g.textAlign='left';g.fillText(tr('cv.hash'),64,H-68);
   g.textAlign='right';g.fillText(tr('cv.foot'),W-80,H-68);
   img.src=c.toDataURL('image/png');
+  const cb=document.getElementById('copyimg');if(cb)cb.disabled=false;
+  imageStatus84(lang==='ja'?'画像の準備ができました。コピーまたは保存してからXを開いてください。':'Your image is ready. Copy or save it, then open X.');
   try{const nb=document.getElementById('nshare');if(nb&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'a.png',{type:'image/png'})]}))nb.hidden=false}catch(e){}
 }
 
@@ -811,7 +822,7 @@ function render(){
   app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',view==='home');
   document.body.classList.toggle('dark-stage',view==='finale');
   if(view==='setup')syncSetup();
-  if(view==='end'&&shareOpen)drawCard();
+  if(view==='end'&&shareOpen)drawCard().catch(()=>imageStatus84(lang==='ja'?'画像を作成できませんでした。共有画面を閉じて、もう一度開いてください。':'Could not prepare the image. Close this dialog and try again.'));
   syncAd();
   startLoop();
 }
@@ -860,10 +871,24 @@ app.addEventListener('click',e=>{
   if(a==='shclose'){shareOpen=false;render()}
   if(a==='saveimg'){const im=document.getElementById('cardimg');if(!im||!im.src)return;const l=document.createElement('a');l.href=im.src;l.download='onelife83_'+s.type+'_'+s.age+'.png';document.body.appendChild(l);l.click();l.remove();toast(tr('t.saved'))}
   if(a==='nshare'){const im=document.getElementById('cardimg');fetch(im.src).then(r=>r.blob()).then(bl=>{const f=new File([bl],'onelife83.png',{type:'image/png'});return navigator.share({files:[f],text:shareText()})}).catch(()=>{})}
+  if(a==='copyimg'){copyImage84();return}
   if(a==='copy'){const t=shareText();
     const fallback=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(tr('t.copied'))}catch(err){toast(tr('t.select'))}ta.remove()};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast(tr('t.copied')),fallback);else fallback()}
 });
+
+function imageStatus84(message){const el=document.getElementById('imgstatus');if(el)el.textContent=message}
+async function copyImage84(){
+  const im=document.getElementById('cardimg');
+  if(!im||!im.src||!im.src.startsWith('data:image/png')){imageStatus84(lang==='ja'?'画像の準備ができるまでお待ちください。':'Please wait until the image is ready.');return}
+  if(!navigator.clipboard||!navigator.clipboard.write||typeof ClipboardItem==='undefined'){
+    imageStatus84(lang==='ja'?'このブラウザでは画像をコピーできません。「画像を保存」し、Xの写真ボタンから添付してください。':'Image copying is unavailable. Save the image and attach it using the photo button on X.');return}
+  try{
+    const blob=fetch(im.src).then(r=>r.blob());
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    imageStatus84(lang==='ja'?'画像をコピーしました。Xの投稿画面を開き、投稿欄で Ctrl＋V（Macは⌘＋V）を押してください。':'Image copied. Open X and paste into the composer with Ctrl+V / ⌘+V.');
+  }catch(e){imageStatus84(lang==='ja'?'画像のコピーが許可されませんでした。「画像を保存」し、Xの写真ボタンから添付してください。':'Copying was not permitted. Save the image and attach it using the photo button on X.')}
+}
 
 function day83(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo'}).format(new Date())}
 function hash83(v){let h=2166136261;for(const c of v)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
