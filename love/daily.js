@@ -75,7 +75,7 @@ const context=[
 ];
 function event(s){const t=typeof module!=='undefined'&&module.exports?require('./core.js').type(s.game.code):root.LoveCore.type(s.game.code);const year=s.age-16,offset=t.base+3*t.mode+(s.profile.focus==='dream'?5:s.profile.focus==='calm'?9:0);const index=(year+offset)%16,e={...pools[s.season][index]};const band=s.age<18?0:s.age<23?1:s.age<45?2:3;let companion=s.profile.relation==='alone'?'友達':s.profile.relation==='dating'?'大切な人':'あの人';
  const living=s.game.log.find(l=>l.stage===6);if(living&&living.choice===2)companion='気の合う友達';
- e.text=e.text.replaceAll('{相手}',companion)+' '+context[band][Math.floor(year/16)%4];
+ e.text=e.text.replaceAll('{相手}',companion)+' '+context[band][(Math.floor(year/16)+year+s.season)%4];
  e.label={park:'公園',library:'図書館',cafe:'カフェ',garden:'花のある暮らし',street:'街角',picnic:'ピクニック',bookshop:'本屋',kitchen:'キッチン',station:'駅',studio:'アトリエ',bedroom:'自分の部屋',beach:'海辺',festival:'お祭り',fireworks:'花火の夜',aquarium:'水族館',cinema:'映画館',home:'リビング',rooftop:'空の見える場所',bakery:'パン屋',gallery:'美術館',travel:'小さな旅',music:'音楽会',lights:'光の並木道'}[e.scene];
  // A route changes the day itself, not only the final card.
  const career=s.game.log.find(l=>l.stage===5);if(career&&career.choice===0&&s.beat%11===0){e.scene='studio';e.action='paint';e.cast=1;e.label='新しい挑戦';e.text='挑戦すると決めたあの日から、少しずつ作品を作りためている。今日は、初めて誰かに褒めてもらえた。 '+context[band][year%4];e.mood='happy';}
