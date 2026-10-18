@@ -432,6 +432,7 @@ function vHome(){
    <span class="hero91scroll">YOUR CHOICES. YOUR STORY.</span>
   </div>
  </header>
+ <div class="invite94">${lineButton94()}<span>${ja?'MBTI好きの友達と、一緒に楽しもう':'Compare lives with your friends'}</span></div>
  ${footer()}`;
 }
 function vTypes93(){const ja=lang==='ja';return `${topNav()}<p class="flow93">${ja?'START YOUR STORY · まずはあなたのMBTI':'START YOUR STORY · YOUR MBTI FIRST'}</p>
@@ -650,6 +651,13 @@ function shareBody(){const d=resultModel85();const intro=lang==='ja'?'MBTI診断
 function shareWord(){return ''}
 function shareText(){return shareWord()+shareBody()+'\n'+resultUrl()}
 function xUrl(){return 'https://x.com/intent/post?text='+encodeURIComponent(shareWord()+shareBody())+'&url='+encodeURIComponent(resultUrl())}
+function lineShareUrl94(result=false){
+ const ja=lang==='ja',url=result?resultUrl():(lang==='ja'?SHARE_URL+'play/?v=94':SHARE_URL+'share/'+lang+'/?v=94');
+ const d=result?resultModel85():null;
+ const text=result?(d.headline.join('')+'\n'+d.type+' · '+d.country+' · '+s.age+(ja?'年の人生':' years')+'\n'+(ja?'あなたのMBTIなら、どんな人生になる？':'What life would your personality lead to?')):(ja?'MBTI好きな友達へ！\n「83億分の1の人生」で、自分のタイプのまま、もうひとつの人生を体験してみない？\n無料・登録不要。最後にドット絵の結果カードが出るよ。':'Try One in 8.3 Billion! Choose your MBTI type and live another life. Free, no sign-up, with a pixel-art life card to share.');
+ return 'https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(text);
+}
+function lineButton94(result=false){return `<a class="btn linebtn94" href="${esc(lineShareUrl94(result))}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.4 2 10.6c0 3.7 3.6 6.8 8.5 7.5l-.6 3 4.9-3.2C19 17 22 14 22 10.6 22 6.4 17.5 3 12 3Z"/></svg>${lang==='ja'?(result?'LINEで結果を送る':'LINEで友達に紹介'):(result?'Send results on LINE':'Invite friends on LINE')}</a>`}
 function threadsUrl(){return 'https://www.threads.net/intent/post?text='+encodeURIComponent(shareText())}
 let friend=null;
 try{const r=qs.get('r');const o=r&&dec(r);if(o&&ORDER.includes(o.t)&&+o.a>0){friend=o;view='friend';if(o.cc&&COUNTRIES[o.cc]&&!qs.get('c')&&!ls('mbtiCountry'))COUNTRY=o.cc}}catch(e){}
@@ -736,7 +744,7 @@ function vEnd(){
   for(let a=s.startAge+1;a<=s.age;a++){const h=s.hist[a-s.startAge-1];cells+=`<i class="on${msAges.has(a)?' ms':''}" style="--h:${h}" title="${esc(tr('u.age',{n:a}))}"></i>`}
   const bs=bestScene();sceneOverride={key:bs.key,age:bs.age,happy:95};
   return `${topNav()}
-  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xに投稿する':'Post to X'}</a><button class="btn ghost" data-act="shopen">${lang==='ja'?'結果画像を保存':'Save result image'}</button></div><p class="note">${lang==='ja'?'文章と結果カード付きリンクは自動で入ります。最後にXで「ポスト」を押すだけ。':'Your text and result-card link are filled in. Review and press Post on X.'}</p></section>
+  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xに投稿する':'Post to X'}</a>${lineButton94(true)}<button class="btn ghost" data-act="shopen">${lang==='ja'?'結果画像を保存':'Save result image'}</button></div><p class="note">${lang==='ja'?'文章と結果カード付きリンクは自動で入ります。最後にXで「ポスト」を押すだけ。':'Your text and result-card link are filled in. Review and press Post on X.'}</p></section>
   <article class="record">
     <header class="rhead"><span>${esc(tr('rec.head'))}</span><span>No. ${no}</span></header>
     <div class="rbody">
