@@ -328,7 +328,7 @@ function sceneEvent(){
 }
 let sceneOverride=null;
 function drawScene(c,t){
-  if(sceneOverride){const sv=s.age,sd=s.dead,sh=s.happy,sH=s.health;s.age=sceneOverride.age;s.dead=false;if(!sceneOverride.key){s.happy=70;s.health=80}
+  if(sceneOverride){const sv=s.age,sd=s.dead,sh=s.happy,sH=s.health;s.age=sceneOverride.age;s.dead=false;if(!sceneOverride.key){s.happy=sceneOverride.happy||70;s.health=80}
     try{if(sceneOverride.key)drawSpecial(c,t,sceneOverride.key);else drawSceneBase(c,t)}finally{s.age=sv;s.dead=sd;s.happy=sh;s.health=sH}return}
   const sp=sceneEvent();if(sp){drawSpecial(c,t,sp.key);return}
   drawSceneBase(c,t);
@@ -678,6 +678,14 @@ function vFinale(){
 
 /* ---------- 人生の記録（結果） ---------- */
 function bestAge(){if(!s.hist.length)return s.startAge;let bi=0;s.hist.forEach((v,i)=>{if(v>s.hist[bi])bi=i});return s.startAge+1+bi}
+/* いちばん幸せだった年の情景：その年のできごと → 前後2年の節目 → ふだんの風景 */
+const SAD_SCN=['breakup','hosp','clinic','crash','closed','fight','care'];
+function bestScene(){const age=bestAge();
+  const ks=yearKeys(age);for(const [key,label,list] of SCN)if(!SAD_SCN.includes(key)&&list.some(k=>ks.includes(k)))return {key,age,label};
+  let best=null;for(const [a,k] of s.ms){const key=MS_SCENE[k];if(!key||SAD_SCN.includes(key))continue;const d=Math.abs(a-age);if(d<=2&&(!best||d<best.d))best={key,age:a,label:'sc.'+key,d}}
+  if(best)return best;
+  return {key:null,age,label:sceneLabelAt(age)}}
+function sceneLabelAt(age){const sv=s.age;s.age=age;try{return sceneInfo().label}catch(e){return 'sc.start'}finally{s.age=sv}}
 function recSummary(){const P=[];
   P.push(tr('rec.s.born',{country:CN(s.country),age:s.startAge,type:s.type}));
   P.push(tr('rec.s.edu',{edu:eduName(s.edu)}));
@@ -692,6 +700,7 @@ function vEnd(){
   const f=(k,v)=>`<div><dt>${esc(tr(k))}</dt><dd>${v}</dd></div>`;
   let cells='';const msAges=new Set(s.ms.map(m=>m[0]));
   for(let a=s.startAge+1;a<=s.age;a++){const h=s.hist[a-s.startAge-1];cells+=`<i class="on${msAges.has(a)?' ms':''}" style="--h:${h}" title="${esc(tr('u.age',{n:a}))}"></i>`}
+  const bs=bestScene();sceneOverride={key:bs.key,age:bs.age,happy:95};
   return `${topNav()}
   <article class="record">
     <header class="rhead"><span>${esc(tr('rec.head'))}</span><span>No. ${no}</span></header>
@@ -718,6 +727,13 @@ function vEnd(){
     </div>
     <div class="rmap"><div class="lmap">${cells}</div></div>
   </article>
+  <figure class="bestimg">
+    <figcaption><span class="eyebrow">${esc(tr('rec.f.best'))}</span><b>${esc(tr('u.age',{n:bestAge()}))} · ${yearOf(bestAge())}</b><span>${esc(tr(bs.label))}</span></figcaption>
+    <div class="fscene"><canvas id="fscene" width="${SW}" height="${SH}" role="img" aria-label="${esc(tr(bs.label))}"></canvas></div>
+  </figure>
+  <div class="ractions xrow">
+    <a class="btn xbtn" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(tr('sh.x'))}</a>
+  </div>
   <section class="sec"><h3>${esc(tr('rec.highlights'))}</h3><ul class="mslist">${hl.map(m=>`<li><span>${esc(tr('u.age',{n:m[0]}))}</span>${esc(tr(m[1],m[2]))}</li>`).join('')||`<li><span>—</span>${esc(tr('rec.quiet'))}</li>`}</ul></section>
   <div class="ractions">
     <button class="btn ghost" data-act="replay">${esc(tr('rec.replay'))}</button>
