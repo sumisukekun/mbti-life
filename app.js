@@ -250,6 +250,7 @@ function stepBase86(){
     setTimeout(()=>{if(view==='life'&&s===me)startFinale()},speed>1?600:1400)}
 }
 function resolve(i){
+  if(!pending||!pending.o[i])return;
   saveSnapshot86();branchTimeline86();
   const e=pending;pending=null;untilChoice=false;s.decisions++;
   const r=e.o[i].fx(s);const rr=typeof r==='string'?RK(r):r;
@@ -258,7 +259,8 @@ function resolve(i){
   if(!autoSkip&&!s.dead&&!manual86)play();
 }
 function chParams(){return {name:s.pname||'',country:'@country.'+s.country}}
-function play(){stop();manual86=false;branchTimeline86();timer=setInterval(()=>{step();if(pending||s.dead)untilChoice=false;render()},untilChoice?60:Math.round(2400/speed))}
+function focusDecision90(){document.getElementById('decision90')?.scrollIntoView?.({behavior:'smooth',block:'start'})}
+function play(){stop();if(!s||s.dead)return;if(pending){render();focusDecision90();return}manual86=false;branchTimeline86();timer=setInterval(()=>{step();if(pending||s.dead)untilChoice=false;render()},untilChoice?60:Math.round(2400/speed))}
 function stop(){clearInterval(timer);timer=null}
 
 /* ---------- 初期設定 ---------- */
@@ -514,7 +516,7 @@ function homeLabel(){return tr(s.house?'h.own':s.atHome?'h.parents':'h.rent')}
 function logText(l){if(l.kind==='nar')return l.ks.map(k=>tr(k)).join(SEP());return tr(l.k,l.p)}
 function vLife(){
   let dec='';
-  if(pending){const e=pending,P=chParams();dec=`<section class="decision" aria-live="polite">
+  if(pending){const e=pending,P=chParams();dec=`<section id="decision90" class="decision" aria-live="polite">
     <div class="dhead"><span class="eyebrow pinkish">${esc(tr('life.big'))}</span><span class="eyebrow pinkish">${esc(tr('u.age',{n:s.age}))} · ${yearOf(s.age)}</span></div>
     <h2 class="dtitle">${esc(tr('life.decTitle',{age:s.age,h:tr('ch.'+e.id+'.h',P)}))}</h2>
     <p class="dbody">${esc(tr('ch.'+e.id+'.body',P))}</p>
@@ -532,8 +534,9 @@ function vLife(){
   const spd=[0.5,1,2,4,8].map(v=>`<button class="sp${speed===v&&!untilChoice?' on':''}" data-speed="${v}">${v}×</button>`).join('');
   return `<header class="topbar">
     <div class="tleft"><span class="brand">${tr('brand.short')}</span><span class="tage">${esc(tr('u.age',{n:s.age}))}</span><span class="tmeta">${flag(s.country)} ${esc(CN(s.country))} · ${yearOf(s.age)} · ${s.type} · ${esc(phase())}</span></div>
+    ${pending?`<div class="wait90" role="status"><b>${lang==='ja'?'⏸ 選択待ち：選ぶと人生が進みます':'⏸ Waiting for your choice'}</b><button class="sp" data-act="choice90">${lang==='ja'?'選択肢を表示 ↓':'Show choices ↓'}</button></div>`:''}
     <div class="tctrl">${s.dead?`<button class="btn small" data-act="toend">${esc(tr('life.toEnd'))}</button>`:`
-      <button class="sp" data-act="toggle">${esc(tr(timer?'life.pause':'life.play'))}</button>${spd}
+      <button class="sp" data-act="toggle">${pending?(lang==='ja'?'選択肢を選ぶ ↓':'Choose an option ↓'):esc(tr(timer?'life.pause':'life.play'))}</button>${spd}
       <button class="sp${untilChoice?' on':''}" data-act="next">${esc(tr('life.next'))}</button>
       <button class="sp${autoSkip?' on':''}" data-act="autotoggle">${esc(tr(autoSkip?'life.autoOn':'life.auto'))}</button>
       <button class="sp" data-act="skip">${esc(tr('life.skip'))}</button>`}</div>
@@ -560,8 +563,8 @@ function vLife(){
         <div class="money"><span>${esc(tr('p.savings'))} <b>${esc(fmtMoney(s.money))}</b></span><span>${s.working&&s.income?esc(tr('p.income'))+' <b>'+esc(fmtMoney(s.income))+'</b>':s.retired?esc(tr('p.pension')):s.uni?esc(tr('p.student')):''}</span></div></section>
     </div>
     <div class="col center">
-      ${sceneHtml()}
       ${dec?`<div class="o1">${dec}</div>`:''}
+      ${sceneHtml()}
       <section class="panel o6 logp"><div class="ph"><h3>${esc(tr('p.log'))}</h3><span>${esc(tr('p.newest'))}</span></div><ol class="log">${logHtml}</ol></section>
     </div>
     <div class="col">
@@ -818,7 +821,10 @@ async function drawCard(){
 }
 
 /* ---------- 描画・操作 ---------- */
+let shownDecision90=null;
 function render(){
+  const choiceKey90=view==='life'&&pending?s.seed+':'+s.age+':'+s.decisions+':'+pending.id:null;
+  const newChoice90=!!choiceKey90&&choiceKey90!==shownDecision90;shownDecision90=choiceKey90;
   if(view!=='finale')sceneOverride=null;
   app.innerHTML=view==='home'?vHome():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():view==='finale'?vFinale():vEnd();
   app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',view==='home');
@@ -827,6 +833,7 @@ function render(){
   if(view==='end')drawCard().catch(()=>imageStatus84(lang==='ja'?'画像を作成できませんでした。共有画面を閉じて、もう一度開いてください。':'Could not prepare the image. Close this dialog and try again.'));
   syncAd();
   startLoop();
+  if(newChoice90)requestAnimationFrame(()=>{if(view==='life'&&pending)focusDecision90()});
 }
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,1800)}
 function go(v){stop();view=v;render();scrollTo(0,0)}
@@ -853,6 +860,7 @@ app.addEventListener('click',e=>{
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
   if(b.dataset.speed){const running=!!timer;speed=+b.dataset.speed;untilChoice=false;if(running&&!pending&&!s.dead)play();render();return}
   const a=b.dataset.act;
+  if(a==='choice90'){focusDecision90();return}
   if(a==='back86'){seekAge86(s.age-1);return}
   if(a==='forward86'){forwardYear86();return}
   if(a==='latest86'){seekAge86(timeline86.at(-1)?.state.age||s.age);return}
@@ -864,9 +872,9 @@ app.addEventListener('click',e=>{
     view='life';render();scrollTo(0,0);if(!pending)play()}
   if(a==='quick'){rng83=null;pending=null;startLife(b.dataset.type,readSetup());quickRun();return}
   if(a==='toggle'){timer?stop():play();render()}
-  if(a==='next'){if(pending)return;untilChoice=true;play();render()}
-  if(a==='autotoggle'){autoSkip=!autoSkip;if(autoSkip&&pending)resolveAuto();render()}
-  if(a==='auto'){autoSkip=true;resolveAuto();render()}
+  if(a==='next'){if(pending){stop();render();focusDecision90();return}untilChoice=true;play();render()}
+  if(a==='autotoggle'){autoSkip=!autoSkip;if(autoSkip){if(pending)resolveAuto();if(!s.dead)play()}render()}
+  if(a==='auto'){autoSkip=true;if(pending)resolveAuto();if(!s.dead)play();render()}
   if(a==='toend'){startFinale();scrollTo(0,0)}
   if(a==='skip'){quickRun()}
   if(a==='finnext'){if(e.target.closest('.fskip,.finbtn'))return;finNext()}
