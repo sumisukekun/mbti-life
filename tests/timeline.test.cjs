@@ -36,3 +36,16 @@ act90('auto');assert.equal(run('pending'),null);assert.equal(run('autoSkip'),tru
 run('launch83(true);stop()');act90('autotoggle');assert.equal(run('pending'),null);assert.equal(run('timer'),1);run('stop()');
 run('launch83(true);stop()');act90('next');assert.equal(run('timer'),null);act90('toggle');assert.equal(run('timer'),null);
 console.log('PASS: year slider restore, RNG and future retention, decision redo, branching, manual step, slow speeds, death rewind');
+
+// Analytics records a completion once per playthrough, even after result rerenders/replay.
+run("window.metricEvents95=[];window.LifeAnalytics={event:(n,v)=>metricEvents95.push({n,v}),view:()=>{}};drawCard=()=>Promise.resolve();launch83(true);stop();autoSkip=true;while(!s.dead){if(pending)resolveAuto();step()}view='end';render();render()");
+assert.equal(run("metricEvents95.filter(x=>x.n==='game_start').length"),1);
+assert.equal(run("metricEvents95.filter(x=>x.n==='game_complete').length"),1);
+run("buildFinale();view='finale';render();view='end';render()");
+assert.equal(run("metricEvents95.filter(x=>x.n==='game_complete').length"),1);
+run("launch83(true);stop();autoSkip=true;while(!s.dead){if(pending)resolveAuto();step()}view='end';render()");
+assert.equal(run("metricEvents95.filter(x=>x.n==='game_start').length"),2);
+assert.equal(run("metricEvents95.filter(x=>x.n==='game_complete').length"),2);
+assert(run('vEnd()').includes('data-share95="x"'));
+assert(run('vEnd()').includes('data-share95="line"'));
+console.log('PASS: analytics start/completion integration, completion deduplication, X/LINE click hooks');

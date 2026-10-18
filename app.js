@@ -636,7 +636,7 @@ const ADSENSE={client:'ca-pub-4478590779171256',slot:'4533542225'};        // �
 const CONTACT_URL='https://businessmaker.net/';
 const tipUrl=()=>lang==='ja'?(TIP_URLS.ja||TIP_URLS.other):(TIP_URLS.other||TIP_URLS.ja);
 function tipBox(){const u=tipUrl();return u?`<div class="tipbox"><div><b>${esc(tr('tip.h'))}</b><p>${esc(tr('tip.p'))}</p></div><a class="btn pinkbtn" href="${esc(u)}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a></div>`:''}
-function footer(){return `<footer class="foot">${tipUrl()?`<a href="${esc(tipUrl())}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a>`:''}<a href="privacy.html">${esc(tr('foot.privacy'))}</a><a href="${CONTACT_URL}" target="_blank" rel="noopener">${esc(tr('foot.contact'))}</a><span>© BusinessMaker</span></footer>`}
+function footer(){return `<footer class="foot">${tipUrl()?`<a href="${esc(tipUrl())}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a>`:''}<a href="privacy.html">${esc(tr('foot.privacy'))}</a><a href="${CONTACT_URL}" target="_blank" rel="noopener">${esc(tr('foot.contact'))}</a>${window.LifeAnalytics?.configured?`<a href="privacy.html" data-analytics-settings>${lang==='ja'?'アクセス解析の設定':'Analytics preferences'}</a>`:''}<span>© BusinessMaker</span></footer>`}
 let adLoaded=false;
 function syncAd(){const w=document.getElementById('adwrap');if(!w)return;const show=!!(ADSENSE.client&&ADSENSE.slot)&&['home','end','friend'].includes(view)&&!shareOpen;
   w.hidden=!show;if(!show)return;w.querySelector('.adl').textContent=tr('ad.label');
@@ -657,7 +657,7 @@ function lineShareUrl94(result=false){
  const text=result?(d.headline.join('')+'\n'+d.type+' · '+d.country+' · '+s.age+(ja?'年の人生':' years')+'\n'+(ja?'あなたのMBTIなら、どんな人生になる？':'What life would your personality lead to?')):(ja?'MBTI好きな友達へ！\n「83億分の1の人生」で、自分のタイプのまま、もうひとつの人生を体験してみない？\n無料・登録不要。最後にドット絵の結果カードが出るよ。':'Try One in 8.3 Billion! Choose your MBTI type and live another life. Free, no sign-up, with a pixel-art life card to share.');
  return 'https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(text);
 }
-function lineButton94(result=false){return `<a class="btn linebtn94" href="${esc(lineShareUrl94(result))}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.4 2 10.6c0 3.7 3.6 6.8 8.5 7.5l-.6 3 4.9-3.2C19 17 22 14 22 10.6 22 6.4 17.5 3 12 3Z"/></svg>${lang==='ja'?(result?'LINEで結果を送る':'LINEで友達に紹介'):(result?'Send results on LINE':'Invite friends on LINE')}</a>`}
+function lineButton94(result=false){return `<a class="btn linebtn94" data-share95="line" data-content95="${result?'result':'invite'}" href="${esc(lineShareUrl94(result))}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.4 2 10.6c0 3.7 3.6 6.8 8.5 7.5l-.6 3 4.9-3.2C19 17 22 14 22 10.6 22 6.4 17.5 3 12 3Z"/></svg>${lang==='ja'?(result?'LINEで結果を送る':'LINEで友達に紹介'):(result?'Send results on LINE':'Invite friends on LINE')}</a>`}
 function threadsUrl(){return 'https://www.threads.net/intent/post?text='+encodeURIComponent(shareText())}
 let friend=null;
 try{const r=qs.get('r');const o=r&&dec(r);if(o&&ORDER.includes(o.t)&&+o.a>0){friend=o;view='friend';if(o.cc&&COUNTRIES[o.cc]&&!qs.get('c')&&!ls('mbtiCountry'))COUNTRY=o.cc}}catch(e){}
@@ -744,7 +744,7 @@ function vEnd(){
   for(let a=s.startAge+1;a<=s.age;a++){const h=s.hist[a-s.startAge-1];cells+=`<i class="on${msAges.has(a)?' ms':''}" style="--h:${h}" title="${esc(tr('u.age',{n:a}))}"></i>`}
   const bs=bestScene();sceneOverride={key:bs.key,age:bs.age,happy:95};
   return `${topNav()}
-  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xに投稿する':'Post to X'}</a>${lineButton94(true)}<button class="btn ghost" data-act="shopen">${lang==='ja'?'結果画像を保存':'Save result image'}</button></div><p class="note">${lang==='ja'?'文章と結果カード付きリンクは自動で入ります。最後にXで「ポスト」を押すだけ。':'Your text and result-card link are filled in. Review and press Post on X.'}</p></section>
+  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" data-share95="x" data-content95="result" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xに投稿する':'Post to X'}</a>${lineButton94(true)}<button class="btn ghost" data-act="shopen">${lang==='ja'?'結果画像を保存':'Save result image'}</button></div><p class="note">${lang==='ja'?'文章と結果カード付きリンクは自動で入ります。最後にXで「ポスト」を押すだけ。':'Your text and result-card link are filled in. Review and press Post on X.'}</p></section>
   <article class="record">
     <header class="rhead"><span>${esc(tr('rec.head'))}</span><span>No. ${no}</span></header>
     <div class="rbody">
@@ -835,12 +835,16 @@ async function drawCard(){
 
 /* ---------- 描画・操作 ---------- */
 let shownDecision90=null;
+let analyticsRun95=0,analyticsCompleted95=-1;
+function metric95(name,values){try{window.LifeAnalytics?.event(name,values)}catch(_){}}
 function render(){
   const choiceKey90=view==='life'&&pending?s.seed+':'+s.age+':'+s.decisions+':'+pending.id:null;
   const newChoice90=!!choiceKey90&&choiceKey90!==shownDecision90;shownDecision90=choiceKey90;
   if(view!=='finale')sceneOverride=null;
   app.innerHTML=view==='home'?vHome():view==='types93'?vTypes93():view==='country93'?vCountry93():view==='quiz'?vQuiz():view==='card'?vCard(cardType,cardFromQuiz):view==='setup'?vSetup(cardType):view==='friend'?vFriend():view==='life'?vLife():view==='finale'?vFinale():vEnd();
   app.setAttribute?.('data-view',view);
+  try{window.LifeAnalytics?.view(view)}catch(_){}
+  if(view==='end'&&s?.dead&&analyticsCompleted95!==analyticsRun95){analyticsCompleted95=analyticsRun95;metric95('game_complete',{mbti_type:s.type})}
   app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',['home','types93','country93'].includes(view));
   document.body.classList.toggle('dark-stage',view==='finale');
   if(view==='setup')syncSetup();
@@ -867,14 +871,14 @@ app.addEventListener('change',e=>{
 app.addEventListener('click',e=>{
   const b=e.target.closest('button,[data-act]');if(!b)return;
   if(b.dataset.country){COUNTRY=b.dataset.country;const l=COUNTRIES[COUNTRY].lang;if(I18N[l])lang=l;applyLang();render();return}
-  if(b.dataset.type&&!b.dataset.act){cardType=b.dataset.type;cardFromQuiz=false;go('card');return}
+  if(b.dataset.type&&!b.dataset.act){metric95('select_type',{mbti_type:b.dataset.type});cardType=b.dataset.type;cardFromQuiz=false;go('card');return}
   if(b.dataset.ans){qa.push(b.dataset.ans);qi++;
     if(qi>=QUIZ.length){const c=k=>qa.filter(x=>x===k).length;cardType=(c('E')>=2?'E':'I')+(c('S')>=2?'S':'N')+(c('T')>=2?'T':'F')+(c('J')>=2?'J':'P');cardFromQuiz=true;view='card'}
     render();return}
   if(b.dataset.choose){resolve(+b.dataset.choose);render();return}
   if(b.dataset.speed){const running=!!timer;speed=+b.dataset.speed;untilChoice=false;if(running&&!pending&&!s.dead)play();render();return}
   const a=b.dataset.act;
-  if(a==='start93'){cardType=null;cardFromQuiz=false;go('types93');return}
+  if(a==='start93'){metric95('start_click');cardType=null;cardFromQuiz=false;go('types93');return}
   if(a==='types93'||a==='world91'){go('types93');return}
   if(a==='country93'){readSetup();go('country93');return}
   if(a==='countrydone93'){go('setup');return}
@@ -901,7 +905,7 @@ app.addEventListener('click',e=>{
   if(a==='again'){rng83=null;const t=s.type;stop();pending=null;autoSkip=false;speed=1;COUNTRY=s.country;startLife(t,prof);view='life';render();scrollTo(0,0);if(!pending)play()}
   if(a==='shopen'){shareOpen=true;render()}
   if(a==='shclose'){shareOpen=false;render()}
-  if(a==='saveimg'){const im=document.getElementById('cardimg');if(!im||!im.src)return;const l=document.createElement('a');l.href=im.src;l.download='onelife83_'+s.type+'_'+s.age+'.png';document.body.appendChild(l);l.click();l.remove();toast(tr('t.saved'))}
+  if(a==='saveimg'){const im=document.getElementById('cardimg');if(!im||!im.src)return;const l=document.createElement('a');l.href=im.src;l.download='onelife83_'+s.type+'_'+s.age+'.png';document.body.appendChild(l);l.click();l.remove();metric95('result_image_save');toast(tr('t.saved'))}
   if(a==='nshare'){const im=document.getElementById('cardimg');fetch(im.src).then(r=>r.blob()).then(bl=>{const f=new File([bl],'onelife83.png',{type:'image/png'});return navigator.share({files:[f],text:shareText()})}).catch(()=>{})}
   if(a==='copyimg'){copyImage84();return}
   if(a==='copy'){const t=shareText();
@@ -917,7 +921,7 @@ function saveSnapshot86(){
  timeline86.push({state:JSON.parse(JSON.stringify(s)),pending,rng:rng83});cursor86=timeline86.length-1;
 }
 function branchTimeline86(){if(cursor86>=0&&cursor86<timeline86.length-1)timeline86=timeline86.slice(0,cursor86+1)}
-function startLife(type,p){manual86=false;timeline86=[];cursor86=-1;if(rng83===null)rng83=Math.floor(Math.random()*4294967296);startLifeBase86(type,p);saveSnapshot86()}
+function startLife(type,p){manual86=false;timeline86=[];cursor86=-1;if(rng83===null)rng83=Math.floor(Math.random()*4294967296);startLifeBase86(type,p);saveSnapshot86();analyticsRun95++;metric95('game_start',{mbti_type:type})}
 function step(){if(!s||pending||s.dead)return;branchTimeline86();stepBase86();saveSnapshot86()}
 function seekAge86(age){
  if(!timeline86.length)return;stop();clearTimeout(fin.t);
