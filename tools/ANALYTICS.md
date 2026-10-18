@@ -1,6 +1,6 @@
 # GA4 setup (v95)
 
-Status: instrumentation is shipped, but collection is OFF until a real GA4 measurement ID is set in analytics-config.js. An empty ID does not load any Google script or send events. This is not a local-only visitor counter.
+Status: GA4 measurement ID G-G4LRT6D9KL is configured (v96). Collection starts only after visitor consent. GA4 Enhanced Measurement must remain OFF for this stream. An empty ID does not load any Google script or send events. This is not a local-only visitor counter.
 
 1. Open https://analytics.google.com/ and create/select the owner's GA4 property.
 2. Admin > Data streams > Web. URL: https://mbti.businessmaker.net/ . Name: 83億分の1の人生.
