@@ -545,7 +545,7 @@ function vLife(){
           <dt>${esc(tr('p.now'))}</dt><dd>${esc(phase())}</dd>
           <dt>${esc(tr('p.edu'))}</dt><dd>${esc(eduName(s.edu))}${s.uni?esc(tr('p.inSchool')):''}</dd>
           <dt>${esc(tr('p.home'))}</dt><dd>${esc(homeLabel())}</dd></dl></div></div>
-        <div class="mrz">L&lt;16&lt;&lt;${s.type}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;${yearOf(s.startAge)}<br>${String(s.seed).padStart(9,'0').slice(0,9)}&lt;${COUNTRIES[s.country].code}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div></section>
+        <div class="mrz">L&lt;83B&lt;&lt;${s.type}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;${yearOf(s.startAge)}<br>${String(s.seed).padStart(9,'0').slice(0,9)}&lt;${COUNTRIES[s.country].code}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div></section>
       <section class="panel o3"><div class="ph"><h3>${esc(tr('p.status'))}</h3><span>0–100</span></div>
         <div class="bars">${bar(tr('p.health'),s.health,'var(--good)')}${bar(tr('p.happy'),s.happy,'var(--sun)')}${bar(tr('p.love'),s.love,'var(--pink)')}${bar(tr('p.work'),s.career,'var(--blue)')}</div>
         <div class="money"><span>${esc(tr('p.savings'))} <b>${esc(fmtMoney(s.money))}</b></span><span>${s.working&&s.income?esc(tr('p.income'))+' <b>'+esc(fmtMoney(s.income))+'</b>':s.retired?esc(tr('p.pension')):s.uni?esc(tr('p.student')):''}</span></div></section>
@@ -614,9 +614,9 @@ const SHARE_URL='https://mbti.businessmaker.net/';
 function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function dec(t){try{t=t.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(t))))}catch(e){return null}}
 function shareData(){return {t:s.type,a:s.age,ti:titleIdx(),r:ratings(),kw:keywords(),c:curve(24),l:lang,cc:s.country}}
-function resultUrl(){return SHARE_URL+'share/'+lang+'/?r='+encodeURIComponent(enc(shareData()))}
-function shareBody(){return tr('share.text',{type:s.type,title:title(),age:s.age,country:CN(s.country),kw:keywords().map(k=>tr(k)).join(tr('kw.sep'))})}
-function shareWord(){const w=document.getElementById('shword');return w&&w.value.trim()?w.value.trim().slice(0,140)+'\n\n':''}
+function resultUrl(){return SHARE_URL+'share/'+lang+'/'+titleIdx()+'/?r='+encodeURIComponent(enc(shareData()))}
+function shareBody(){const d=resultModel85();return d.headline.join('')+'\n'+d.type+' · '+d.country+' · '+s.age+(lang==='ja'?'年の人生':' years')+'\n'+d.summary+'\n#83億分の1の人生 #MBTI'}
+function shareWord(){return ''}
 function shareText(){return shareWord()+shareBody()+'\n'+resultUrl()}
 function xUrl(){return 'https://x.com/intent/post?text='+encodeURIComponent(shareWord()+shareBody())+'&url='+encodeURIComponent(resultUrl())}
 function threadsUrl(){return 'https://www.threads.net/intent/post?text='+encodeURIComponent(shareText())}
@@ -705,6 +705,7 @@ function vEnd(){
   for(let a=s.startAge+1;a<=s.age;a++){const h=s.hist[a-s.startAge-1];cells+=`<i class="on${msAges.has(a)?' ms':''}" style="--h:${h}" title="${esc(tr('u.age',{n:a}))}"></i>`}
   const bs=bestScene();sceneOverride={key:bs.key,age:bs.age,happy:95};
   return `${topNav()}
+  <section class="resultshare85"><h2>${lang==='ja'?'あなたの人生が、一枚のカードに。':'Your life, in one card.'}</h2><p>${lang==='ja'?'結果に合わせて、キャラクターと物語を自動で作りました。':'Your character and story are created automatically from your results.'}</p><img id="resultcard85" class="resultcard85" alt="${esc(s.type+' · '+title())}"><div class="row"><a class="btn pinkbtn" href="${xUrl()}" target="_blank" rel="noopener">${lang==='ja'?'Xにこの人生をシェア':'Share this life on X'}</a><button class="btn ghost" data-act="shopen">${lang==='ja'?'詳しい結果画像を保存・共有':'Save or share full result image'}</button></div><p class="note">${lang==='ja'?'Xのリンク画像は称号に合うキャラクター、保存画像は今回の年齢・評価まで入ったカードです。':'The link preview shows your life theme. The full image includes your exact age and ratings.'}</p></section>
   <article class="record">
     <header class="rhead"><span>${esc(tr('rec.head'))}</span><span>No. ${no}</span></header>
     <div class="rbody">
@@ -752,7 +753,7 @@ function vEnd(){
 function vShare(){
   return `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="mbox">
     <div class="mhead"><h3 id="shT">${esc(tr('sh.title'))}</h3><button class="mx" data-act="shclose" aria-label="${esc(tr('sh.close'))}">×</button></div>
-    <p class="mlead">${esc(tr('sh.lead'))}</p>
+    <p class="mlead">${lang==='ja'?'文章も画像も、今回の人生から自動で作成しました。':'Your text and image were automatically created from your life.'}</p>
     <section class="xsteps" aria-label="${lang==='ja'?'Xへの画像投稿手順':'Image sharing steps'}">
       <h4>${lang==='ja'?'Xに結果画像を付けて投稿':'Post your result image on X'}</h4>
       <ol><li>${lang==='ja'?'下の「結果画像をコピー」を押す。使えない場合は「画像を保存」。':'Copy your result image below, or save it if copying is unavailable.'}</li>
@@ -762,7 +763,6 @@ function vShare(){
       <button class="btn pinkbtn wide" data-act="copyimg" id="copyimg" disabled>${lang==='ja'?'結果画像をコピー':'Copy result image'}</button>
       <p id="imgstatus" role="status" aria-live="polite">${lang==='ja'?'画像を準備しています…':'Preparing your image…'}</p>
     </section>
-    <label class="mword"><span>${esc(tr('sh.word'))}</span><textarea id="shword" rows="2" maxlength="140" placeholder="${esc(tr('sh.wordPh'))}"></textarea></label>
     <button class="btn pinkbtn wide" data-act="nshare" id="nshare" hidden>${esc(tr('sh.img'))}</button>
     <div class="mgrid">
       <a class="sbtn" id="shx" href="${xUrl()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>${esc(lang==='ja'?'Xの投稿画面を開く':'Open X composer')}</a>
@@ -771,48 +771,41 @@ function vShare(){
       <button class="sbtn" data-act="saveimg">${esc(tr('sh.save'))}</button>
     </div>
     <figure class="mprev"><figcaption>${esc(tr('sh.preview'))}</figcaption><img class="imgcard" id="cardimg" alt="${esc(s.type+' · '+title())}"></figure>
-    <p class="note">${esc(tr('sh.privacy'))}</p>
+    <p class="note">${lang==='ja'?'画像には性格タイプ・国・享年・称号・結果の要約・評価が入ります。入力した個人名は載せません。':'The image includes your type, country, lifespan, title, summary and ratings. Personal names are omitted.'}</p>
     ${tipUrl()?`<a class="mtip" href="${esc(tipUrl())}" target="_blank" rel="noopener">♥ ${esc(tr('tip.btn'))}</a>`:''}
   </div></div>`;
 }
 function updShareLinks(){const x=document.getElementById('shx'),t=document.getElementById('shth');if(x)x.href=xUrl();if(t)t.href=threadsUrl()}
 const FONTS={fr:['"Dela Gothic One"','"Zen Kaku Gothic New"'],de:['"Dela Gothic One"','"Zen Kaku Gothic New"'],it:['"Dela Gothic One"','"Zen Kaku Gothic New"'],pt:['"Dela Gothic One"','"Zen Kaku Gothic New"'],id:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ja:['"Dela Gothic One"','"Zen Kaku Gothic New"'],en:['"Dela Gothic One"','"Zen Kaku Gothic New"'],es:['"Dela Gothic One"','"Zen Kaku Gothic New"'],ko:['"Black Han Sans"','"Noto Sans KR"'],zh:['"Noto Sans TC"','"Noto Sans TC"']};
+let cardCache85=null;
+function resultModel85(){
+ const ja=lang==='ja',theme=titleIdx(),job=s.job?tr(s.job):'';
+ const heads=(ja?LifeResultCard.headlinesJA:LifeResultCard.headlinesEN)[theme].slice();
+ if(ja&&theme===3&&s.job&&(/^jobE?\.nf\./.test(s.job)||['jobs.med','jobs.edu'].includes(s.job)))heads.splice(0,2,'人を支えて、','世界も歩いた。');
+ const parts=[];
+ if(job)parts.push(ja?job+'として働き': 'Worked as '+job);
+ if(s.trips>0)parts.push(ja?'旅にも出かけ': 'explored the world');
+ if(s.kids>0)parts.push(ja?s.kids+'人の子どもの親になり':'became a parent to '+s.kids);
+ else if(s.married)parts.push(ja?'大切な人と暮らし':'shared life with a partner');
+ if(!parts.length)parts.push(ja?'自分のペースで道を選び':'Chose a path at your own pace');
+ const last=parts.length-1;if(ja)parts[last]=parts[last].replace(/働き$/,'働いた').replace(/出かけ$/,'出かけた').replace(/になり$/,'になった').replace(/暮らし$/,'暮らした').replace(/選び$/,'選んだ');
+ const summary=ja?parts.slice(0,3).join('、')+'。'+s.age+'年の物語。':parts.slice(0,3).join(', ')+'. A '+s.age+'-year story in '+CN(s.country)+'.';
+ return {lang,theme,seed:s.seed,brand:tr('brand'),type:s.type,country:CN(s.country),age:s.age,title:title(),headline:heads,summary,ratings:ratings(),keywords:keywords().map(k=>tr(k)),labels:RATES.map(k=>tr('rate.'+k))};
+}
 async function drawCard(){
-  const img=document.getElementById('cardimg');if(!img)return;
-  const F=FONTS[lang]||FONTS.ja;const DW=lang==='zh'?'900 ':'';
-  try{await Promise.all([document.fonts.load(DW+'80px '+F[0]),document.fonts.load('700 30px '+F[1])])}catch(e){}
-  const W=1200,H=675,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
-  const P='#F2367F',B='#2D57F0',INK='#1A1D3A',PAPER='#EDEFF5',MUTED='#5E6385',GOLD='#E0A400';
-  const D=DW+'{s}px '+F[0]+',sans-serif',BD=F[1]+',sans-serif';const DF=n=>D.replace('{s}',n);
-  const sd=shareData();
-  g.fillStyle=PAPER;g.fillRect(0,0,W,H);
-  g.fillStyle='rgba(45,87,240,.16)';for(let y=6;y<H;y+=16)for(let x=(y/16%2)*8+6;x<W;x+=16){g.beginPath();g.arc(x,y,2,0,7);g.fill()}
-  g.fillStyle=B;g.fillRect(52,52,W-96,H-96);g.fillStyle='#F8F9FC';g.fillRect(40,40,W-96,H-96);
-  g.strokeStyle=INK;g.lineWidth=4;g.strokeRect(40,40,W-96,H-96);
-  g.font=DF(150);g.textBaseline='alphabetic';
-  g.fillStyle='rgba(45,87,240,.55)';g.fillText(sd.t,84,224);g.fillStyle=P;g.fillText(sd.t,78,218);
-  g.fillStyle=MUTED;g.font='500 26px '+BD;g.fillText(tr('type.'+sd.t+'.n')+'  |  '+CN(s.country),84,266);
-  g.save();g.translate(940,150);g.rotate(-0.12);g.strokeStyle=P;g.lineWidth=5;g.beginPath();g.arc(0,0,92,0,7);g.stroke();
-  g.fillStyle=P;g.textAlign='center';g.font='700 26px '+BD;g.fillText(tr('cv.age'),0,-22);g.font=DF(72);g.fillText(sd.a,0,50);g.restore();
-  const tt=q(title());let fs=60;g.font=DF(fs);while(g.measureText(tt).width>W-170&&fs>32){fs-=4;g.font=DF(fs)}
-  g.fillStyle='rgba(242,54,127,.6)';g.fillText(tt,84,356);g.fillStyle=INK;g.fillText(tt,80,352);
-  RATES.forEach((k,i)=>{const x=84+i*262,v=sd.r[k];
-    g.fillStyle=MUTED;g.font='500 22px '+BD;g.fillText(tr('rate.'+k),x,408);
-    g.font='30px '+BD;for(let s2=0;s2<5;s2++){g.fillStyle=s2<v?GOLD:'#C9CDE0';g.fillText('★',x+s2*30,446)}
-    g.fillStyle=INK;let rf=24;g.font='700 '+rf+'px '+BD;const rl=tr('rate.'+k+'.'+v);while(g.measureText(rl).width>230&&rf>14){rf-=2;g.font='700 '+rf+'px '+BD}g.fillText(rl,x,482)});
-  g.font='700 24px '+BD;let kx=84;
-  sd.kw.forEach(w=>{const t='#'+tr(w),tw=g.measureText(t).width+32;g.fillStyle=INK;g.beginPath();g.roundRect(kx,510,tw,46,23);g.fill();g.fillStyle='#fff';g.fillText(t,kx+16,541);kx+=tw+12});
-  const cx=Math.max(kx+30,700),cw=W-96-cx-20,cy=520,ch=46,cv=sd.c;
-  if(cw>120&&cv.length>1){g.fillStyle=MUTED;g.font='500 18px '+BD;g.fillText(tr('cv.wave'),cx,cy-8);
-    g.beginPath();cv.forEach((v,i)=>{const x=cx+i/(cv.length-1)*cw,y=cy+ch-v/100*ch;i?g.lineTo(x,y):g.moveTo(x,y)});
-    g.strokeStyle=P;g.lineWidth=4;g.lineJoin='round';g.stroke();
-    g.lineTo(cx+cw,cy+ch);g.lineTo(cx,cy+ch);g.closePath();g.fillStyle='rgba(242,54,127,.12)';g.fill()}
-  g.fillStyle=INK;g.fillRect(40,H-96,W-96,40);g.fillStyle='#fff';g.font='700 22px '+BD;g.textAlign='left';g.fillText(tr('cv.hash'),64,H-68);
-  g.textAlign='right';g.fillText(tr('cv.foot'),W-80,H-68);
-  img.src=c.toDataURL('image/png');
-  const cb=document.getElementById('copyimg');if(cb)cb.disabled=false;
-  imageStatus84(lang==='ja'?'画像の準備ができました。コピーまたは保存してからXを開いてください。':'Your image is ready. Copy or save it, then open X.');
-  try{const nb=document.getElementById('nshare');if(nb&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'a.png',{type:'image/png'})]}))nb.hidden=false}catch(e){}
+ const state=s,data=resultModel85(),key=JSON.stringify(data),F=FONTS[lang]||FONTS.ja;
+ if(!cardCache85||cardCache85.key!==key){
+  try{await Promise.race([document.fonts.load('700 40px '+F[1]),new Promise(resolve=>setTimeout(resolve,1800))])}catch(e){}
+  if(s!==state)return;
+  const c=document.createElement('canvas');c.width=LifeResultCard.width;c.height=LifeResultCard.height;
+  LifeResultCard.draw(c.getContext('2d'),{...data,font:F[1]+',sans-serif'});
+  cardCache85={key,url:c.toDataURL('image/png')};
+ }
+ if(s!==state)return;
+ for(const id of ['cardimg','resultcard85']){const img=document.getElementById(id);if(img)img.src=cardCache85.url}
+ const cb=document.getElementById('copyimg');if(cb)cb.disabled=false;
+ imageStatus84(lang==='ja'?'画像と文章を自動で作成しました。':'Your image and text are ready.');
+ try{const nb=document.getElementById('nshare');if(nb&&navigator.canShare&&navigator.canShare({files:[new File([new Blob(['x'])],'life.png',{type:'image/png'})]}))nb.hidden=false}catch(e){}
 }
 
 /* ---------- 描画・操作 ---------- */
@@ -822,7 +815,7 @@ function render(){
   app.classList.toggle('wide',view==='life'||view==='end');app.classList.toggle('mid',view==='home');
   document.body.classList.toggle('dark-stage',view==='finale');
   if(view==='setup')syncSetup();
-  if(view==='end'&&shareOpen)drawCard().catch(()=>imageStatus84(lang==='ja'?'画像を作成できませんでした。共有画面を閉じて、もう一度開いてください。':'Could not prepare the image. Close this dialog and try again.'));
+  if(view==='end')drawCard().catch(()=>imageStatus84(lang==='ja'?'画像を作成できませんでした。共有画面を閉じて、もう一度開いてください。':'Could not prepare the image. Close this dialog and try again.'));
   syncAd();
   startLoop();
 }

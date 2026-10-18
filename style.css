@@ -326,3 +326,6 @@ body.dark-stage{background:#0E1018}
 
 /* v84 image sharing */
 .xsteps{background:var(--paper,#EDEFF5);border:2px solid var(--line,#cbd0e0);border-radius:16px;padding:18px;margin:16px 0}.xsteps h4{margin:0 0 10px}.xsteps ol{padding-left:1.5em;line-height:1.8}.xsteps li+li{margin-top:8px}#imgstatus{font-size:14px;line-height:1.65;overflow-wrap:anywhere}.xsteps button:disabled{opacity:.5;cursor:wait}
+
+/* v85 automatic illustrated life card */
+.resultshare85{margin:24px 0 36px}.resultshare85 h2{margin-bottom:8px}.resultcard85{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#edeff8;border-radius:18px;margin:18px 0}.resultshare85 .row{flex-wrap:wrap;gap:12px}.resultshare85 .note{line-height:1.7}.resultshare85 .btn{white-space:normal}@media(max-width:600px){.resultshare85 .row .btn{width:100%}}
